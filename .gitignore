@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+build/
+dist/
+target/
+**/build/
+
+# Move
+move/**/build/
+
+# Env / secrets (NEVER commit keys — Enoki secret, private keys)
+.env
+.env.local
+.env.*.local
+*.local
+!*.example
+
+# Local tooling / editor
+.claude/
+.DS_Store
+*.log
+
+# Sui keystore safety (never commit private keys)
+*.keystore
