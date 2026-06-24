@@ -1,0 +1,12 @@
+{
+  "name": "yeti-wells-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Deploy / seed / helper scripts for Yeti Wells (run with Node 24+ native TS)",
+  "scripts": {
+    "seed": "node seed.ts"
+  },
+  "dependencies": {
+    "@mysten/sui": "^2.20.0"
+  }
+}

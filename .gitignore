@@ -25,3 +25,6 @@ move/**/build/
 
 # Sui keystore safety (never commit private keys)
 *.keystore
+
+# regenerated each seed run
+scripts/.seeded.json
