@@ -65,7 +65,13 @@ cd app && pnpm install && pnpm dev
 ## Deployed (testnet)
 | Key | Value |
 |---|---|
-| Package ID | _set after Phase 1 publish — see `PROGRESS.md`_ |
+| Package ID | `0xa2090b3f15a42375b239a835d83bc86a3c1e4b4c76142529491236bc8d93d66a` |
+| Registry (shared) | `0x12e8905da2765dafc7362888e9309d8a8e94a9c745afafbc288887c6967157d9` |
+| Demo WaterProject | `0x75c3992a51fd620a66b4efe4bd81a4b2967c7f62bfb8a0a6a58c103ce006dcfb` |
+
+Full ID list + build log in [`PROGRESS.md`](PROGRESS.md).
 
 ## Status
-Phase 0 (foundations) ✅ · Phase 1 (core Move protocol) ⏳ — see [`PROGRESS.md`](PROGRESS.md).
+Phase 0 (foundations) ✅ · Phase 1 (core Move protocol) ✅ — 25 Move tests green (90% coverage),
+full donate → TEE-attested release → NFT-fills loop verified on-chain. Phase 2 (frontend + gasless
+zkLogin donate) is next. See [`PROGRESS.md`](PROGRESS.md).

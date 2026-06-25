@@ -49,12 +49,12 @@ tx.moveCall({
     tx.pure.string('Nairobi, KE'),
     tx.pure.string('Solar-powered borehole serving ~1,200 people with clean water.'),
     tx.pure.string(''), // image_blob_id (Walrus) — placeholder until Phase 4
-    tx.pure.u64(5_000_000_000n), // funding goal: 5 SUI
+    tx.pure.u64(1_000_000_000n), // funding goal: 1 SUI (testnet-affordable demo)
     tx.pure.u64(100_000n), // target liters
     tx.pure.address(payout),
     tx.pure.vector('string', ['Drill borehole', 'Deliver 50,000 L', 'Project complete']),
     tx.pure.vector('u64', [0n, 50_000n, 100_000n]), // liter thresholds
-    tx.pure.vector('u64', [1_500_000_000n, 2_000_000_000n, 1_500_000_000n]), // releases (sum = goal)
+    tx.pure.vector('u64', [200_000_000n, 300_000_000n, 500_000_000n]), // releases (sum = goal)
   ],
 });
 
