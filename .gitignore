@@ -31,4 +31,4 @@ scripts/.seeded.json
 
 # browser test artifacts
 .playwright-mcp/
-yeti-wells-phase2.png
+yeti-wells-phase*.png

@@ -37,3 +37,27 @@ body {
     ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
     "Segoe UI Symbol", "Noto Color Emoji";
 }
+
+/* --- Impact NFT snow globe --- */
+@keyframes yw-wave {
+  from { transform: translateX(0); }
+  to { transform: translateX(-40px); }
+}
+.yw-wave-back { animation: yw-wave 7s linear infinite; }
+.yw-wave-front { animation: yw-wave 4s linear infinite; }
+
+/* soft icy halo behind the globe */
+.yw-globe-glow {
+  background: radial-gradient(circle at 50% 42%, color-mix(in oklch, var(--color-sui) 22%, transparent), transparent 62%);
+}
+
+@keyframes yw-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.yw-pop { animation: yw-pop 600ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .yw-wave-back, .yw-wave-front, .yw-pop { animation: none; }
+}
