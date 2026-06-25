@@ -21,12 +21,15 @@ Sponsorship is locked to only our Move functions via a **whitelist** (so the key
    scopes needed — the default `openid`/`email`/`profile` is enough.
 3. **APIs & Services → Credentials → Create credentials → OAuth client ID**.
    - Application type: **Web application**.
-   - **Authorized JavaScript origins** (this is what the popup flow needs):
+   - **Authorized JavaScript origins**:
      - `http://localhost:5173`  (Vite dev — our app)
-     - `http://localhost`  (some setups check the bare host)
      - add your deployed origin later (e.g. `https://yetiwells.vercel.app`) before the demo.
-   - **Authorized redirect URIs**: leave empty for now. Enoki uses a **popup** flow, so JS origins matter,
-     not redirect URIs. (Only add one if the Enoki portal later tells you to, or if you set a custom `redirectUrl`.)
+   - **Authorized redirect URIs** — REQUIRED (Enoki's zkLogin flow redirects here even though the window is a
+     popup). Add **the app origin with a trailing slash**:
+     - `http://localhost:5173/`  (and `http://localhost:5173` without the slash, to be safe)
+     - add your deployed origin's `/` later (e.g. `https://yetiwells.vercel.app/`).
+     > If you skip this you get `Error 400: redirect_uri_mismatch` — Google's error details show the exact
+     > `redirect_uri` it expected (the app origin + `/`); register that value verbatim.
 4. Copy the **Client ID** (looks like `xx…apps.googleusercontent.com`). You do **not** need the client secret.
 
 ## 2. Enoki Developer Portal — app, provider, keys, sponsorship
@@ -74,7 +77,9 @@ ENOKI_SECRET_KEY=enoki_private_...
 Confirm too: app created on **testnet**, Google provider added, the **3 targets whitelisted**.
 
 ## 5. Gotchas (from the live‑doc validation)
-- **Popup, not redirect** → it's the **Authorized JavaScript origins** that must include `http://localhost:5173`.
+- **Popup flow still uses a redirect URI.** Google needs BOTH: **Authorized JavaScript origins** (`http://localhost:5173`)
+  AND **Authorized redirect URIs** (`http://localhost:5173/`). Missing the redirect URI → `Error 400: redirect_uri_mismatch`
+  (verified: the flow sends `redirect_uri=http://localhost:5173/`).
 - **Never expose the secret key** to the browser (no `VITE_`/`NEXT_PUBLIC_` prefix). It only goes in `server/.env`.
 - **Network must match**: Enoki wallets are bound to a network; we register on **testnet**. (If we add mainnet
   later, the wallet must be re‑registered for that network.)
