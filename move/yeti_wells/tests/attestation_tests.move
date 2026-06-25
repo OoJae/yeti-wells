@@ -9,6 +9,8 @@ use yeti_wells::registry::{Self, Registry};
 use yeti_wells::project::{Self, WaterProject};
 use yeti_wells::donation;
 use yeti_wells::attestation::{Self, Enclave};
+use yeti_wells::enclave;
+use yeti_wells::enclave_app::{Self, AppWitness};
 
 const ADMIN: address = @0xAD;
 const ALICE: address = @0xA11CE;
@@ -24,6 +26,9 @@ const SIG_HAPPY: vector<u8> = x"6a629f7f686a848d79f0fb6a92af0ef067d2391a4a16323f
 const SIG_LOW: vector<u8> = x"f6a00262ac66450784ff6fc85c267e9129f3b297a2e0cb97ff1c87a75c848d73a347ab66495ecf8b4f56518cbdd995c6a096cf2ad8fa98325f427ef21b08d603";
 const SIG_WRONG: vector<u8> = x"f33c0c8edbd48efdb2b793177fffe03774b045c33fb1be283bfe924b6736f27f17a37c8eb08a6aaf3adf572553801cd5dc58c73ddaf4fd3e34bb579baeaacf0a";
 const SIG_TRAILING: vector<u8> = x"bb27c25551f06e4e9b6486384756978aea192cc2909846bf53eab30cc9c813474697fefe5756f22e92d8e70f0893f2e90214ec194c9cc6172c9b59829837e10e";
+// Phase 5: signatures over the Nautilus IntentMessage(MilestoneReport).
+const SIG_V2_HAPPY: vector<u8> = x"96f28a60073e592cd00fb82217ee2f6d79b25683047eb264ef8f89c17309a9c53577fb138e4bbd84ca5db461c4198d37f06c787c851948056f9fac28b797f90b";
+const SIG_V2_WRONG: vector<u8> = x"62b94c6082915c306f10570e1bb267a4760b7fa829fa64c41b6b2a046a824e0e423ee52c5f644305d552079277863bd3880eebeb3f5f3282755341c70b52c50a";
 
 // Deterministic setup. Goal 6 SUI, target 100_000. create_for_testing milestones:
 // index 0: threshold 0, release 3 SUI ; index 1: threshold 100_000, release 3 SUI.
@@ -204,6 +209,88 @@ fun test_submit_double_release_aborts() {
         let payload = attestation::encode_report_for_testing(object::id_address(&proj), 0, 60_000, TS_MS);
         attestation::submit_attested_milestone(&mut proj, &mut reg, &enclave, payload, SIG_HAPPY, ts::ctx(&mut sc));
         ts::return_shared(enclave);
+        ts::return_shared(proj);
+        ts::return_shared(reg);
+    };
+    ts::end(sc);
+}
+
+// === Phase 5: real Nautilus IntentMessage verification (submit_attested_milestone_v2) ===
+
+#[test]
+fun test_v2_intent_serde() {
+    // Move IntentMessage(MilestoneReport) BCS must byte-match the TS/Rust signer (parity check).
+    let bytes = attestation::encode_intent_for_testing(
+        @0x63d9a65220318469fb169034d8a011eae3f014fed2a1f8c006183e2ece3c3975, 0, 60_000, 1_000);
+    assert!(bytes == x"01e80300000000000063d9a65220318469fb169034d8a011eae3f014fed2a1f8c006183e2ece3c3975000000000000000060ea000000000000e803000000000000", 0);
+}
+
+fun register_dev_enclave(sc: &mut ts::Scenario) {
+    ts::next_tx(sc, ADMIN);
+    let cap = enclave_app::new_cap_for_testing(ts::ctx(sc));
+    enclave::register_enclave_dev(&cap, PUBKEY, ts::ctx(sc));
+    transfer::public_transfer(cap, ADMIN);
+}
+
+#[test]
+fun test_submit_v2_happy_path() {
+    let mut sc = setup();
+    alice_donates(&mut sc, 6_000_000_000);
+    register_dev_enclave(&mut sc);
+    ts::next_tx(&mut sc, ADMIN);
+    {
+        let mut reg = ts::take_shared<Registry>(&sc);
+        let mut proj = ts::take_shared<WaterProject>(&sc);
+        let enc = ts::take_shared<enclave::Enclave<AppWitness>>(&sc);
+        let pid = object::id_address(&proj);
+        attestation::submit_attested_milestone_v2(
+            &mut proj, &mut reg, &enc, TS_MS, pid, 0, 60_000, SIG_V2_HAPPY, ts::ctx(&mut sc));
+        assert!(project::delivered_liters(&proj) == 60_000, 0);
+        assert!(project::milestone_released(&proj, 0), 1);
+        assert!(project::escrow_value(&proj) == 3_000_000_000, 2);
+        ts::return_shared(enc);
+        ts::return_shared(proj);
+        ts::return_shared(reg);
+    };
+    ts::end(sc);
+}
+
+#[test]
+#[expected_failure(abort_code = attestation::E_BAD_SIGNATURE)]
+fun test_submit_v2_bad_sig_aborts() {
+    let mut sc = setup();
+    register_dev_enclave(&mut sc);
+    ts::next_tx(&mut sc, ADMIN);
+    {
+        let mut reg = ts::take_shared<Registry>(&sc);
+        let mut proj = ts::take_shared<WaterProject>(&sc);
+        let enc = ts::take_shared<enclave::Enclave<AppWitness>>(&sc);
+        let mut bad = SIG_V2_HAPPY;
+        let b0 = *vector::borrow(&bad, 0);
+        *vector::borrow_mut(&mut bad, 0) = b0 ^ 1u8;
+        let pid = object::id_address(&proj);
+        attestation::submit_attested_milestone_v2(
+            &mut proj, &mut reg, &enc, TS_MS, pid, 0, 60_000, bad, ts::ctx(&mut sc));
+        ts::return_shared(enc);
+        ts::return_shared(proj);
+        ts::return_shared(reg);
+    };
+    ts::end(sc);
+}
+
+#[test]
+#[expected_failure(abort_code = attestation::E_WRONG_PROJECT)]
+fun test_submit_v2_wrong_project_aborts() {
+    let mut sc = setup();
+    register_dev_enclave(&mut sc);
+    ts::next_tx(&mut sc, ADMIN);
+    {
+        let mut reg = ts::take_shared<Registry>(&sc);
+        let mut proj = ts::take_shared<WaterProject>(&sc);
+        let enc = ts::take_shared<enclave::Enclave<AppWitness>>(&sc);
+        attestation::submit_attested_milestone_v2(
+            &mut proj, &mut reg, &enc, TS_MS, WRONG_PROJECT, 0, 60_000, SIG_V2_WRONG, ts::ctx(&mut sc));
+        ts::return_shared(enc);
         ts::return_shared(proj);
         ts::return_shared(reg);
     };

@@ -32,3 +32,6 @@ scripts/.seeded.json
 # browser test artifacts
 .playwright-mcp/
 yeti-wells-phase*.png
+
+# Nautilus clone (reproducible; our app lives in enclave/yeti_wells_app)
+enclave/nautilus/

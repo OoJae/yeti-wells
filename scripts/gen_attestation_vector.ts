@@ -30,6 +30,22 @@ const MilestoneReport = bcs.struct('MilestoneReport', {
   timestamp_ms: bcs.u64(),
 });
 
+// Phase 5: Nautilus IntentMessage wrapper { intent: u8, timestamp_ms: u64, payload: MilestoneReport }.
+const MILESTONE_INTENT = 1;
+const IntentMessage = bcs.struct('IntentMessage', {
+  intent: bcs.u8(),
+  timestamp_ms: bcs.u64(),
+  payload: MilestoneReport,
+});
+
+function encodeIntent(projectId: string, mi: bigint, liters: bigint, ts: bigint): Uint8Array {
+  return IntentMessage.serialize({
+    intent: MILESTONE_INTENT,
+    timestamp_ms: ts,
+    payload: { project_id: projectId, milestone_index: mi, liters_reading: liters, timestamp_ms: ts },
+  }).toBytes();
+}
+
 function encode(projectId: string, mi: bigint, liters: bigint, ts: bigint): Uint8Array {
   return MilestoneReport.serialize({
     project_id: projectId,
@@ -68,6 +84,16 @@ console.log(`const SIG_HAPPY: vector<u8> = ${hex(sHappy)};`);
 console.log(`const SIG_LOW: vector<u8> = ${hex(sLow)};`);
 console.log(`const SIG_WRONG: vector<u8> = ${hex(sWrong)};`);
 console.log(`const SIG_TRAILING: vector<u8> = ${hex(sTrailing)};`);
-console.log('// sanity (payload hex, for cross-checking Move encode_report_for_testing):');
-console.log(`//   pHappy    = ${Buffer.from(pHappy).toString('hex')}`);
-console.log(`//   pHappy.len= ${pHappy.length} (expect 56)`);
+// Phase 5 (v2): IntentMessage-wrapped happy path (milestone 0, 60_000 liters) + wrong-project.
+const pIntentHappy = encodeIntent(PROJECT_ID, 0n, 60_000n, TS);
+const pIntentWrong = encodeIntent(WRONG_PROJECT_ID, 0n, 60_000n, TS);
+const sIntentHappy = await sig(pIntentHappy);
+const sIntentWrong = await sig(pIntentWrong);
+console.log(`const SIG_V2_HAPPY: vector<u8> = ${hex(sIntentHappy)};`);
+console.log(`const SIG_V2_WRONG: vector<u8> = ${hex(sIntentWrong)};`);
+
+console.log('// sanity (payload hex, for cross-checking Move encode_*_for_testing):');
+console.log(`//   pHappy        = ${Buffer.from(pHappy).toString('hex')}`);
+console.log(`//   pHappy.len    = ${pHappy.length} (expect 56)`);
+console.log(`//   pIntentHappy  = ${Buffer.from(pIntentHappy).toString('hex')}`);
+console.log(`//   pIntentHappy.len = ${pIntentHappy.length} (expect 65 = 1+8+56)`);
