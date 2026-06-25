@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { ShieldCheck } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { addEvidence } from "../lib/api";
+import { addEvidence, runAttestation } from "../lib/api";
 
 function fileToBase64(file: File): Promise<{ base64: string; mediaType: string }> {
   return new Promise((resolve, reject) => {
@@ -21,74 +22,128 @@ function fileToBase64(file: File): Promise<{ base64: string; mediaType: string }
 
 export function StewardPanel() {
   const qc = useQueryClient();
+  const [stewardKey, setStewardKey] = useState(() => localStorage.getItem("yw_steward_key") ?? "");
+
+  // Evidence
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState("");
   const [milestone, setMilestone] = useState(0);
-  const [stewardKey, setStewardKey] = useState(() => localStorage.getItem("yw_steward_key") ?? "");
-  const [status, setStatus] = useState<"idle" | "uploading" | "done" | "error">("idle");
-  const [msg, setMsg] = useState("");
+  const [evStatus, setEvStatus] = useState<"idle" | "uploading" | "done" | "error">("idle");
+  const [evMsg, setEvMsg] = useState("");
 
-  const onSubmit = async () => {
+  // Attestation
+  const [attMilestone, setAttMilestone] = useState(1);
+  const [attStatus, setAttStatus] = useState<"idle" | "running" | "done" | "error">("idle");
+  const [attMsg, setAttMsg] = useState("");
+
+  const saveKey = () => localStorage.setItem("yw_steward_key", stewardKey);
+
+  const onUpload = async () => {
     if (!file) return;
-    setStatus("uploading");
-    setMsg("");
+    setEvStatus("uploading");
+    setEvMsg("");
     try {
-      localStorage.setItem("yw_steward_key", stewardKey);
+      saveKey();
       const { base64, mediaType } = await fileToBase64(file);
       const r = await addEvidence({ dataBase64: base64, mediaType, caption, milestoneIndex: milestone }, stewardKey);
-      setStatus("done");
-      setMsg(r.blobId);
+      setEvStatus("done");
+      setEvMsg(r.blobId);
       setFile(null);
       setCaption("");
       qc.invalidateQueries();
     } catch (e) {
-      setStatus("error");
-      setMsg(e instanceof Error ? e.message : String(e));
+      setEvStatus("error");
+      setEvMsg(e instanceof Error ? e.message : String(e));
+    }
+  };
+
+  const onAttest = async () => {
+    setAttStatus("running");
+    setAttMsg("");
+    try {
+      saveKey();
+      const r = await runAttestation(attMilestone, stewardKey);
+      setAttStatus("done");
+      setAttMsg(`${r.source} · ${r.litersReading.toLocaleString()} L · ${r.digest.slice(0, 10)}…`);
+      qc.invalidateQueries();
+    } catch (e) {
+      setAttStatus("error");
+      setAttMsg(e instanceof Error ? e.message : String(e));
     }
   };
 
   return (
     <Card className="border-dashed">
       <CardHeader>
-        <CardTitle className="text-base">Steward — add evidence</CardTitle>
+        <CardTitle className="text-base">Steward console</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-5">
         <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-foreground"
-        />
-        <input
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          placeholder="Caption (e.g. Borehole completed)"
+          value={stewardKey}
+          onChange={(e) => setStewardKey(e.target.value)}
+          placeholder="Steward key"
+          type="password"
           className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
         />
-        <div className="flex gap-2">
-          <input
-            type="number"
-            min={0}
-            value={milestone}
-            onChange={(e) => setMilestone(Number(e.target.value))}
-            className="w-28 rounded-md border bg-background px-3 py-1.5 text-sm"
-            placeholder="Milestone"
-          />
-          <input
-            value={stewardKey}
-            onChange={(e) => setStewardKey(e.target.value)}
-            placeholder="Steward key"
-            type="password"
-            className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm"
-          />
+
+        {/* TEE attestation */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5 text-sm font-medium">
+            <ShieldCheck className="h-4 w-4 text-sui" /> Run TEE attestation (Nautilus)
+          </div>
+          <p className="text-xs text-muted-foreground">
+            The enclave reads the flow-meter, signs a MilestoneReport, and the chain verifies it before releasing escrow.
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              min={0}
+              value={attMilestone}
+              onChange={(e) => setAttMilestone(Number(e.target.value))}
+              className="w-28 rounded-md border bg-background px-3 py-1.5 text-sm"
+              title="Milestone index"
+            />
+            <Button className="flex-1" disabled={!stewardKey} loading={attStatus === "running"} onClick={onAttest}>
+              {attStatus === "running" ? "Attesting…" : "Run attestation"}
+            </Button>
+          </div>
+          {attStatus === "done" && <p className="text-xs text-sui">✅ Verified &amp; released — {attMsg}</p>}
+          {attStatus === "error" && <p className="break-all text-xs text-destructive-foreground">{attMsg}</p>}
         </div>
-        <Button className="w-full" disabled={!file || !stewardKey} loading={status === "uploading"} onClick={onSubmit}>
-          {status === "uploading" ? "Uploading to Walrus…" : "Upload evidence"}
-        </Button>
-        {status === "done" && (
-          <p className="text-xs text-sui">✅ Stored on Walrus — blob {msg.slice(0, 10)}… recorded on-chain</p>
-        )}
-        {status === "error" && <p className="break-all text-xs text-destructive-foreground">{msg}</p>}
+
+        {/* Evidence */}
+        <div className="space-y-2 border-t pt-4">
+          <div className="text-sm font-medium">Add evidence (Walrus)</div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-foreground"
+          />
+          <input
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            placeholder="Caption (e.g. Borehole completed)"
+            className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
+          />
+          <div className="flex gap-2">
+            <input
+              type="number"
+              min={0}
+              value={milestone}
+              onChange={(e) => setMilestone(Number(e.target.value))}
+              className="w-28 rounded-md border bg-background px-3 py-1.5 text-sm"
+              title="Milestone index"
+            />
+            <Button className="flex-1" disabled={!file || !stewardKey} loading={evStatus === "uploading"} onClick={onUpload}>
+              {evStatus === "uploading" ? "Uploading to Walrus…" : "Upload evidence"}
+            </Button>
+          </div>
+          {evStatus === "done" && (
+            <p className="text-xs text-sui">✅ Stored on Walrus — blob {evMsg.slice(0, 10)}… recorded on-chain</p>
+          )}
+          {evStatus === "error" && <p className="break-all text-xs text-destructive-foreground">{evMsg}</p>}
+        </div>
       </CardContent>
     </Card>
   );

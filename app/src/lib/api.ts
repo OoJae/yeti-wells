@@ -40,3 +40,18 @@ export async function addEvidence(
   if (!res.ok) throw new Error(json?.error ?? "add-evidence failed");
   return json as { blobId: string; digest: string };
 }
+
+/** Steward-only: run a TEE attestation (enclave-signed reading) that releases a milestone + advances liters. */
+export async function runAttestation(
+  milestoneIndex: number,
+  stewardKey: string,
+): Promise<{ digest: string; litersReading: number; source: string }> {
+  const res = await fetch(`${config.apiUrl}/api/steward/run-attestation`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-steward-key": stewardKey },
+    body: JSON.stringify({ milestoneIndex }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json?.error ?? "attestation failed");
+  return json as { digest: string; litersReading: number; source: string };
+}

@@ -15,6 +15,7 @@ import { EnokiClient } from '@mysten/enoki';
 import { SuiJsonRpcClient, getJsonRpcFullnodeUrl } from '@mysten/sui/jsonRpc';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { Transaction } from '@mysten/sui/transactions';
+import { bcs } from '@mysten/sui/bcs';
 
 const env = (k: string): string => {
   const v = process.env[k];
@@ -43,6 +44,74 @@ const ALLOWED_MOVE_CALL_TARGETS = [
   `${PACKAGE_ID}::donation::donate_again`,
   `${PACKAGE_ID}::impact_nft::sync_impact`,
 ];
+
+// --- Phase 5: Nautilus attestation ---
+const PACKAGE_ID_V2 = process.env.PACKAGE_ID_V2 ?? PACKAGE_ID; // upgraded pkg id (Phase-5 fn targets)
+const REGISTRY_ID = env('REGISTRY_ID');
+const ENCLAVE_ID = process.env.ENCLAVE_ID ?? '';
+const ENCLAVE_URL = process.env.ENCLAVE_URL ?? ''; // set => real AWS Nitro enclave; empty => local sim signer
+const MILESTONE_INTENT = 1;
+
+// Local simulated-enclave key — same fixed seed as the on-chain dev enclave + gen_attestation_vector.
+const enclaveKp = (() => {
+  const seed = new Uint8Array(32);
+  for (let i = 0; i < 32; i++) seed[i] = (i * 7 + 13) & 0xff;
+  return Ed25519Keypair.fromSecretKey(seed);
+})();
+
+// IntentMessage(MilestoneReport) — byte-identical to the Move + Rust structs.
+const MilestoneReport = bcs.struct('MilestoneReport', {
+  project_id: bcs.Address,
+  milestone_index: bcs.u64(),
+  liters_reading: bcs.u64(),
+  timestamp_ms: bcs.u64(),
+});
+const IntentMessage = bcs.struct('IntentMessage', {
+  intent: bcs.u8(),
+  timestamp_ms: bcs.u64(),
+  payload: MilestoneReport,
+});
+
+// Mock flow-meter; defaults to the project target so an attestation fills the globe to 100%.
+let sensorLiters = Number(process.env.SENSOR_DEFAULT ?? 100000);
+
+/** Produce a TEE-signed milestone reading: the real AWS enclave if ENCLAVE_URL is set, else the local sim signer. */
+async function enclaveAttest(
+  milestoneIndex: number,
+): Promise<{ signature: number[]; timestampMs: number; litersReading: number }> {
+  if (ENCLAVE_URL) {
+    const r = await fetch(`${ENCLAVE_URL}/process_data`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payload: { project_id: WATER_PROJECT_ID, milestone_index: milestoneIndex } }),
+    });
+    if (!r.ok) throw new Error(`enclave ${r.status}`);
+    // Nautilus ProcessedDataResponse: { response: IntentMessage{ timestamp_ms, data: MilestoneReport }, signature }.
+    const j = (await r.json()) as {
+      signature: string;
+      response: { timestamp_ms: number; data: { liters_reading: number } };
+    };
+    return {
+      signature: Array.from(Buffer.from(j.signature, 'hex')),
+      timestampMs: Number(j.response.timestamp_ms),
+      litersReading: Number(j.response.data.liters_reading),
+    };
+  }
+  const timestampMs = Date.now();
+  const litersReading = sensorLiters;
+  const bytes = IntentMessage.serialize({
+    intent: MILESTONE_INTENT,
+    timestamp_ms: BigInt(timestampMs),
+    payload: {
+      project_id: WATER_PROJECT_ID,
+      milestone_index: BigInt(milestoneIndex),
+      liters_reading: BigInt(litersReading),
+      timestamp_ms: BigInt(timestampMs),
+    },
+  }).toBytes();
+  const sig = await enclaveKp.sign(bytes);
+  return { signature: Array.from(sig), timestampMs, litersReading };
+}
 
 // Upload raw bytes to the public Walrus testnet publisher; returns the blobId (no WAL needed).
 async function uploadToWalrus(bytes: Uint8Array, epochs = 5): Promise<string> {
@@ -174,7 +243,60 @@ app.post('/api/steward/add-evidence', async (req, res) => {
   }
 });
 
+// Mock flow-meter sensor.
+app.get('/api/sensor', (_req, res) => res.json({ liters: sensorLiters }));
+app.post('/api/sensor/bump', (req, res) => {
+  const l = Number(req.body?.liters);
+  if (!Number.isNaN(l)) sensorLiters = l;
+  res.json({ liters: sensorLiters });
+});
+
+// Steward-only: get a TEE-signed reading (enclave) and submit it on-chain to release the milestone + advance liters.
+app.post('/api/steward/run-attestation', async (req, res) => {
+  try {
+    if (!STEWARD_KEY || req.header('x-steward-key') !== STEWARD_KEY) {
+      return res.status(401).json({ error: 'unauthorized' });
+    }
+    if (!ENCLAVE_ID) return res.status(500).json({ error: 'ENCLAVE_ID not set — register the enclave first' });
+    const milestoneIndex = Number(req.body?.milestoneIndex ?? 1);
+    const att = await enclaveAttest(milestoneIndex);
+
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `${PACKAGE_ID_V2}::attestation::submit_attested_milestone_v2`,
+      arguments: [
+        tx.object(WATER_PROJECT_ID),
+        tx.object(REGISTRY_ID),
+        tx.object(ENCLAVE_ID),
+        tx.pure.u64(BigInt(att.timestampMs)),
+        tx.pure.address(WATER_PROJECT_ID),
+        tx.pure.u64(BigInt(milestoneIndex)),
+        tx.pure.u64(BigInt(att.litersReading)),
+        tx.pure.vector('u8', att.signature),
+      ],
+    });
+    const result = await sui.signAndExecuteTransaction({
+      signer: funder,
+      transaction: tx,
+      options: { showEffects: true },
+    });
+    await sui.waitForTransaction({ digest: result.digest });
+    if (result.effects?.status?.status !== 'success') {
+      return res.status(500).json({ error: 'attestation failed', status: result.effects?.status });
+    }
+    return res.json({
+      digest: result.digest,
+      milestoneIndex,
+      litersReading: att.litersReading,
+      source: ENCLAVE_URL ? 'aws-nitro' : 'local-sim',
+    });
+  } catch (e) {
+    console.error('run-attestation error', e);
+    return res.status(500).json({ error: String((e as Error)?.message ?? e) });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Yeti Wells backend on http://localhost:${PORT} (network=${NETWORK})`);
-  console.log(`  funder=${funderAddress}`);
+  console.log(`  funder=${funderAddress}  enclave=${ENCLAVE_ID || '(unset)'}  source=${ENCLAVE_URL ? 'aws-nitro' : 'local-sim'}`);
 });
