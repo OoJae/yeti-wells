@@ -28,3 +28,7 @@ move/**/build/
 
 # regenerated each seed run
 scripts/.seeded.json
+
+# browser test artifacts
+.playwright-mcp/
+yeti-wells-phase2.png
