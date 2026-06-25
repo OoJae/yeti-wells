@@ -25,3 +25,18 @@ export function sponsor(transactionKindBytes: string, sender: string) {
 export function execute(digest: string, signature: string) {
   return post<{ digest: string }>("/api/execute", { digest, signature });
 }
+
+/** Steward-only: upload an evidence file to Walrus + record its blob_id on-chain. */
+export async function addEvidence(
+  payload: { dataBase64: string; mediaType: string; caption: string; milestoneIndex: number },
+  stewardKey: string,
+): Promise<{ blobId: string; digest: string }> {
+  const res = await fetch(`${config.apiUrl}/api/steward/add-evidence`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-steward-key": stewardKey },
+    body: JSON.stringify(payload),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json?.error ?? "add-evidence failed");
+  return json as { blobId: string; digest: string };
+}

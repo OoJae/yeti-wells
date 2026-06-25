@@ -27,6 +27,10 @@ const PACKAGE_ID = env('PACKAGE_ID');
 const GRANT_AMOUNT_MIST = BigInt(process.env.GRANT_AMOUNT_MIST ?? '100000000');
 const PORT = Number(process.env.PORT ?? 3001);
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN ?? 'http://localhost:5173';
+const ADMIN_CAP_ID = env('ADMIN_CAP_ID');
+const WATER_PROJECT_ID = env('WATER_PROJECT_ID');
+const WALRUS_PUBLISHER = process.env.WALRUS_PUBLISHER ?? 'https://publisher.walrus-testnet.walrus.space';
+const STEWARD_KEY = process.env.STEWARD_KEY ?? '';
 
 const enoki = new EnokiClient({ apiKey: env('ENOKI_SECRET_KEY') });
 const sui = new SuiJsonRpcClient({ url: getJsonRpcFullnodeUrl(NETWORK) });
@@ -40,9 +44,22 @@ const ALLOWED_MOVE_CALL_TARGETS = [
   `${PACKAGE_ID}::impact_nft::sync_impact`,
 ];
 
+// Upload raw bytes to the public Walrus testnet publisher; returns the blobId (no WAL needed).
+async function uploadToWalrus(bytes: Uint8Array, epochs = 5): Promise<string> {
+  const r = await fetch(`${WALRUS_PUBLISHER}/v1/blobs?epochs=${epochs}`, { method: 'PUT', body: bytes });
+  if (!r.ok) throw new Error(`Walrus publisher ${r.status}`);
+  const j = (await r.json()) as {
+    newlyCreated?: { blobObject?: { blobId?: string } };
+    alreadyCertified?: { blobId?: string };
+  };
+  const blobId = j.newlyCreated?.blobObject?.blobId ?? j.alreadyCertified?.blobId;
+  if (!blobId) throw new Error('Walrus: no blobId in response');
+  return blobId;
+}
+
 const app = express();
 app.use(cors({ origin: ALLOWED_ORIGIN }));
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '12mb' }));
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, network: NETWORK, funder: funderAddress, package: PACKAGE_ID });
@@ -111,6 +128,48 @@ app.post('/api/execute', async (req, res) => {
     return res.json({ digest: result.digest });
   } catch (e) {
     console.error('execute error', e);
+    return res.status(500).json({ error: String((e as Error)?.message ?? e) });
+  }
+});
+
+// Steward-only: upload an evidence file to Walrus and record its blob_id on-chain (admin-signed).
+app.post('/api/steward/add-evidence', async (req, res) => {
+  try {
+    if (!STEWARD_KEY || req.header('x-steward-key') !== STEWARD_KEY) {
+      return res.status(401).json({ error: 'unauthorized' });
+    }
+    const { dataBase64, mediaType, caption, milestoneIndex } = req.body ?? {};
+    if (typeof dataBase64 !== 'string' || typeof mediaType !== 'string') {
+      return res.status(400).json({ error: 'dataBase64 and mediaType required' });
+    }
+    const bytes = new Uint8Array(Buffer.from(dataBase64, 'base64'));
+    const blobId = await uploadToWalrus(bytes);
+
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `${PACKAGE_ID}::project::add_evidence`,
+      arguments: [
+        tx.object(ADMIN_CAP_ID),
+        tx.object(WATER_PROJECT_ID),
+        tx.pure.string(blobId),
+        tx.pure.string(mediaType),
+        tx.pure.string(typeof caption === 'string' ? caption : ''),
+        tx.pure.u64(BigInt(Number(milestoneIndex) || 0)),
+        tx.pure.u64(BigInt(Date.now())),
+      ],
+    });
+    const result = await sui.signAndExecuteTransaction({
+      signer: funder,
+      transaction: tx,
+      options: { showEffects: true },
+    });
+    await sui.waitForTransaction({ digest: result.digest });
+    if (result.effects?.status?.status !== 'success') {
+      return res.status(500).json({ error: 'add_evidence failed', status: result.effects?.status });
+    }
+    return res.json({ blobId, digest: result.digest });
+  } catch (e) {
+    console.error('add-evidence error', e);
     return res.status(500).json({ error: String((e as Error)?.message ?? e) });
   }
 });

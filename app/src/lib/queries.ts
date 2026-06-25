@@ -4,6 +4,14 @@ import { config, IMPACT_NFT_TYPE } from "../config";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fields = (data: any): any => data?.data?.content?.fields;
 
+export interface EvidenceView {
+  blobId: string;
+  mediaType: string;
+  caption: string;
+  milestoneIndex: number;
+  timestampMs: string;
+}
+
 export interface ProjectView {
   name: string;
   location: string;
@@ -14,6 +22,7 @@ export interface ProjectView {
   fundingGoalMist: string;
   status: number;
   payout: string;
+  evidence: EvidenceView[];
 }
 
 export function useProject() {
@@ -34,6 +43,16 @@ export function useProject() {
         fundingGoalMist: f.funding_goal_mist,
         status: Number(f.status),
         payout: f.payout,
+        evidence: (f.evidence ?? []).map((e: any) => {
+          const x = e?.fields ?? e;
+          return {
+            blobId: x.blob_id,
+            mediaType: x.media_type,
+            caption: x.caption,
+            milestoneIndex: Number(x.milestone_index),
+            timestampMs: String(x.timestamp_ms),
+          };
+        }),
       }
     : null;
   return { ...q, project };

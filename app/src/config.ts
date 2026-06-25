@@ -9,7 +9,11 @@ export const config = {
   enokiPublicKey: env.VITE_ENOKI_PUBLIC_KEY as string,
   googleClientId: env.VITE_GOOGLE_CLIENT_ID as string,
   apiUrl: (env.VITE_API_URL ?? "http://localhost:3001") as string,
+  walrusAggregator: (env.VITE_WALRUS_AGGREGATOR ?? "https://aggregator.walrus-testnet.walrus.space") as string,
 };
+
+/** Public Walrus aggregator URL to read a blob (usable as an <img src>). */
+export const walrusBlobUrl = (blobId: string) => `${config.walrusAggregator}/v1/blobs/${blobId}`;
 
 export const MIST_PER_SUI = 1_000_000_000;
 
