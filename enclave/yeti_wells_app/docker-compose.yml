@@ -1,0 +1,18 @@
+# Marlin Oyster deployment manifest for the Yeti Wells enclave.
+# After `docker build` + push, set `image` to the pushed digest (oyster computes PCRs from it):
+#   DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' <registry>/yeti-wells-enclave:latest)
+#   then put ${DIGEST} below.
+# Deploy:  oyster-cvm deploy --wallet-private-key $PK --docker-compose ./docker-compose.yml \
+#            --instance-type c6g.xlarge --duration-in-minutes 60 --deployment sui
+services:
+  yeti-wells-enclave:
+    image: <registry>/yeti-wells-enclave@sha256:<digest>
+    container_name: yeti-wells-enclave
+    restart: unless-stopped
+    init: true
+    network_mode: host
+    environment:
+      # The trusted flow-meter feed the enclave reads; must return { "liters": <u64> }.
+      - SENSOR_URL=https://<your-flow-meter>/reading
+      # Unused by the Yeti Wells app (present only because the shared AppState carries it).
+      - API_KEY=unused

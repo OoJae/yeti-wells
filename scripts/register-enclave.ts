@@ -23,7 +23,11 @@ const CAP_ID = req("ENCLAVE_CAP_ID");
 const admin = Ed25519Keypair.fromSecretKey(req("ADMIN_SECRET_KEY"));
 const client = new SuiJsonRpcClient({ url: getJsonRpcFullnodeUrl("testnet") });
 const APP_WITNESS = `${PKG_V2}::enclave_app::AppWitness`;
-const dev = process.argv.includes("--dev");
+// --pubkey=<hex> registers a specific enclave ed25519 key (e.g. a Marlin Oyster enclave's, from /health_check);
+// without it, --dev registers the local sim signer's key. Either way uses register_enclave_dev (PCRs verified
+// off-chain by `oyster-cvm verify` — the Oyster trust model). ENCLAVE_PUBKEY env works too.
+const pubkeyArg = process.argv.find((a) => a.startsWith("--pubkey="))?.split("=")[1] ?? process.env.ENCLAVE_PUBKEY;
+const dev = process.argv.includes("--dev") || !!pubkeyArg;
 
 /** Fixed simulated-enclave ed25519 key (same seed as the backend signer + gen_attestation_vector). */
 function localEnclaveKeypair(): Ed25519Keypair {
@@ -85,8 +89,10 @@ if (!dev) {
   process.exit(0);
 }
 
-// --- dev/sim registration ---
-const pubkey = localEnclaveKeypair().getPublicKey().toRawBytes();
+// --- dev / Oyster-key registration (register_enclave_dev with the given ed25519 pubkey) ---
+const pubkey = pubkeyArg
+  ? new Uint8Array(Buffer.from(pubkeyArg.replace(/^0x/, ""), "hex"))
+  : localEnclaveKeypair().getPublicKey().toRawBytes();
 const tx = new Transaction();
 tx.moveCall({
   target: `${PKG_V2}::enclave::register_enclave_dev`,
