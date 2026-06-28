@@ -13,9 +13,13 @@ use yeti_wells::registry::{Self, AdminCap, Registry};
 use yeti_wells::events;
 
 const E_BAD_MILESTONES: u64 = 0;
+const E_BAD_PARAMS: u64 = 1;
+const E_NOT_CANCELLABLE: u64 = 2;
+const E_UNDERFLOW: u64 = 3;
 
 /// Status codes.
 const STATUS_FUNDRAISING: u8 = 0;
+const STATUS_CANCELLED: u8 = 2;
 
 public struct WaterProject has key {
     id: UID,
@@ -57,9 +61,73 @@ public struct EvidenceRef has store {
 
 // --- ADMIN entry functions ---
 
-/// Create a water project. Milestones are supplied as three parallel vectors (PTB / seed-friendly).
+/// Create a water project (legacy, unvalidated, no enclave binding). Retained for back-compat; new
+/// campaigns use `create_project_v2`. Milestones are three parallel vectors (PTB / seed-friendly).
 public fun create_project(
     _admin: &AdminCap,
+    registry: &mut Registry,
+    name: String,
+    location: String,
+    description: String,
+    image_blob_id: String,
+    funding_goal_mist: u64,
+    target_liters: u64,
+    payout: address,
+    milestone_descriptions: vector<String>,
+    milestone_thresholds: vector<u64>,
+    milestone_releases: vector<u64>,
+    ctx: &mut TxContext,
+) {
+    build_project(
+        registry, name, location, description, image_blob_id, funding_goal_mist, target_liters, payout,
+        milestone_descriptions, milestone_thresholds, milestone_releases, option::none(), ctx,
+    );
+}
+
+/// Hardened campaign creation (Phase 9): validates the milestone schedule and BINDS the attesting
+/// enclave at creation, so `attestation::release_milestone` can require this exact enclave. `enclave_id`
+/// is the on-chain `enclave::Enclave<AppWitness>` object id allowed to release this project's milestones.
+public fun create_project_v2(
+    _admin: &AdminCap,
+    registry: &mut Registry,
+    name: String,
+    location: String,
+    description: String,
+    image_blob_id: String,
+    funding_goal_mist: u64,
+    target_liters: u64,
+    payout: address,
+    milestone_descriptions: vector<String>,
+    milestone_thresholds: vector<u64>,
+    milestone_releases: vector<u64>,
+    enclave_id: ID,
+    ctx: &mut TxContext,
+) {
+    assert!(funding_goal_mist > 0 && target_liters > 0, E_BAD_PARAMS);
+    let n = milestone_descriptions.length();
+    assert!(n > 0 && n == milestone_thresholds.length() && n == milestone_releases.length(), E_BAD_MILESTONES);
+    // thresholds strictly increasing and <= target; each release > 0; sum(releases) <= funding goal.
+    let mut i = 0;
+    let mut sum = 0u64;
+    while (i < n) {
+        let th = milestone_thresholds[i];
+        assert!(th <= target_liters, E_BAD_MILESTONES);
+        if (i > 0) { assert!(th > milestone_thresholds[i - 1], E_BAD_MILESTONES); };
+        let rl = milestone_releases[i];
+        assert!(rl > 0, E_BAD_MILESTONES);
+        sum = sum + rl;
+        i = i + 1;
+    };
+    assert!(sum <= funding_goal_mist, E_BAD_MILESTONES);
+
+    build_project(
+        registry, name, location, description, image_blob_id, funding_goal_mist, target_liters, payout,
+        milestone_descriptions, milestone_thresholds, milestone_releases, option::some(enclave_id), ctx,
+    );
+}
+
+/// Shared constructor: builds the milestone vector, creates + shares the WaterProject, emits ProjectCreated.
+fun build_project(
     registry: &mut Registry,
     name: String,
     location: String,
@@ -71,6 +139,7 @@ public fun create_project(
     mut milestone_descriptions: vector<String>,
     mut milestone_thresholds: vector<u64>,
     mut milestone_releases: vector<u64>,
+    enclave_id: Option<ID>,
     ctx: &mut TxContext,
 ) {
     let n = milestone_descriptions.length();
@@ -112,7 +181,7 @@ public fun create_project(
         status: STATUS_FUNDRAISING,
         steward,
         payout,
-        enclave_id: option::none(),
+        enclave_id,
         milestones,
         evidence: vector[],
         escrow: balance::zero<SUI>(),
@@ -142,6 +211,14 @@ public fun set_enclave(_admin: &AdminCap, project: &mut WaterProject, enclave_id
     project.enclave_id = option::some(enclave_id);
 }
 
+/// Admin: cancel a still-fundraising project so donors can reclaim their share of remaining escrow
+/// via `donation::refund`. Only a fundraising project can be cancelled (idempotent guard).
+public fun cancel_project(_admin: &AdminCap, project: &mut WaterProject) {
+    assert!(project.status == STATUS_FUNDRAISING, E_NOT_CANCELLABLE);
+    project.status = STATUS_CANCELLED;
+    events::emit_project_cancelled(object::id(project));
+}
+
 // --- package-internal mutators (donation / attestation) ---
 
 /// Escrow a balance and grow `raised_mist`.
@@ -159,6 +236,17 @@ public(package) fun take_release(project: &mut WaterProject, amount: u64, ctx: &
 /// Record that a donor now holds an ImpactNFT for this project.
 public(package) fun register_donor(project: &mut WaterProject, donor: address, nft_id: ID) {
     project.donors.add(donor, nft_id);
+}
+
+/// Remove a donor from the index (on refund). Aborts if absent — prevents double-refund.
+public(package) fun remove_donor(project: &mut WaterProject, donor: address): ID {
+    project.donors.remove(donor)
+}
+
+/// Reverse `deposit`'s raised accounting on refund (escrow itself leaves via `take_release`).
+public(package) fun sub_raised(project: &mut WaterProject, amount: u64) {
+    assert!(project.raised_mist >= amount, E_UNDERFLOW);
+    project.raised_mist = project.raised_mist - amount;
 }
 
 public(package) fun mark_milestone_released(project: &mut WaterProject, idx: u64, ts_ms: u64) {
@@ -213,6 +301,8 @@ public fun payout(p: &WaterProject): address { p.payout }
 public fun steward(p: &WaterProject): address { p.steward }
 
 public fun status(p: &WaterProject): u8 { p.status }
+
+public fun is_cancelled(p: &WaterProject): bool { p.status == STATUS_CANCELLED }
 
 public fun enclave_id(p: &WaterProject): Option<ID> { p.enclave_id }
 

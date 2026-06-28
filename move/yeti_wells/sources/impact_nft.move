@@ -94,15 +94,25 @@ public fun sync_impact(nft: &mut ImpactNFT, project: &WaterProject) {
     let delivered = project::delivered_liters(project);
     let raised = project::raised_mist(project);
     // u128 intermediate: `delivered * donated` overflows u64 at mist scale (1 SUI = 1e9 mist).
-    let attributed = if (raised == 0) {
+    let computed = if (raised == 0) {
         0
     } else {
         (((delivered as u128) * (nft.donated_mist as u128)) / (raised as u128)) as u64
     };
+    // MONOTONIC: never let a later donation (which grows `raised`) shrink an earlier donor's attributed
+    // liters/XP/tier — the Impact NFT must never visibly un-fill. Favor the donor; never regress.
+    let attributed = if (computed > nft.liters_attributed) { computed } else { nft.liters_attributed };
     nft.liters_attributed = attributed;
     nft.xp = attributed; // 1 XP per attributed liter (tunable)
     nft.tier = tier_for(attributed);
     events::emit_impact_grew(object::id(nft), nft.project_id, attributed, nft.xp, nft.tier);
+}
+
+/// Destroy a soulbound NFT. `public(package)` so ONLY `donation::refund` can call it (preserves the
+/// soulbound invariant — no `store`, no transfer, the only exit is a refund on a cancelled project).
+public(package) fun burn(nft: ImpactNFT) {
+    let ImpactNFT { id, .. } = nft;
+    object::delete(id);
 }
 
 fun tier_for(xp: u64): u8 {

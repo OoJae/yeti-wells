@@ -107,3 +107,133 @@ fun test_add_evidence_and_set_enclave() {
     };
     ts::end(scenario);
 }
+
+// === Phase 9: create_project_v2 validation + cancel ===
+
+fun dummy_id(scenario: &mut ts::Scenario): ID {
+    let u = object::new(ts::ctx(scenario));
+    let id = object::uid_to_inner(&u);
+    object::delete(u);
+    id
+}
+
+#[test]
+fun test_create_project_v2_validates_and_binds() {
+    let mut scenario = ts::begin(ADMIN);
+    registry::init_for_testing(ts::ctx(&mut scenario));
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let mut reg = ts::take_shared<Registry>(&scenario);
+        let cap = ts::take_from_sender<AdminCap>(&scenario);
+        let enc_id = dummy_id(&mut scenario);
+        project::create_project_v2(
+            &cap, &mut reg,
+            s(b"Turkana"), s(b"KE"), s(b"desc"), s(b"blob"),
+            5_000_000_000, 100_000, PAYOUT,
+            vector[s(b"a"), s(b"b")],
+            vector[0, 50_000],            // strictly increasing, <= target
+            vector[2_000_000_000, 3_000_000_000], // sum == goal
+            enc_id,
+            ts::ctx(&mut scenario),
+        );
+        ts::return_to_sender(&scenario, cap);
+        ts::return_shared(reg);
+    };
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let proj = ts::take_shared<WaterProject>(&scenario);
+        assert!(project::enclave_id(&proj).is_some(), 0); // bound at creation
+        ts::return_shared(proj);
+    };
+    ts::end(scenario);
+}
+
+#[test]
+#[expected_failure(abort_code = project::E_BAD_MILESTONES)]
+fun test_create_project_v2_non_monotonic_aborts() {
+    let mut scenario = ts::begin(ADMIN);
+    registry::init_for_testing(ts::ctx(&mut scenario));
+    ts::next_tx(&mut scenario, ADMIN);
+    let mut reg = ts::take_shared<Registry>(&scenario);
+    let cap = ts::take_from_sender<AdminCap>(&scenario);
+    let enc_id = dummy_id(&mut scenario);
+    project::create_project_v2(
+        &cap, &mut reg, s(b"x"), s(b"y"), s(b"z"), s(b"b"),
+        5_000_000_000, 100_000, PAYOUT,
+        vector[s(b"a"), s(b"b")],
+        vector[50_000, 50_000],            // NOT strictly increasing -> abort
+        vector[1_000_000_000, 1_000_000_000],
+        enc_id, ts::ctx(&mut scenario),
+    );
+    ts::return_to_sender(&scenario, cap);
+    ts::return_shared(reg);
+    ts::end(scenario);
+}
+
+#[test]
+#[expected_failure(abort_code = project::E_BAD_MILESTONES)]
+fun test_create_project_v2_releases_exceed_goal_aborts() {
+    let mut scenario = ts::begin(ADMIN);
+    registry::init_for_testing(ts::ctx(&mut scenario));
+    ts::next_tx(&mut scenario, ADMIN);
+    let mut reg = ts::take_shared<Registry>(&scenario);
+    let cap = ts::take_from_sender<AdminCap>(&scenario);
+    let enc_id = dummy_id(&mut scenario);
+    project::create_project_v2(
+        &cap, &mut reg, s(b"x"), s(b"y"), s(b"z"), s(b"b"),
+        1_000_000_000, 100_000, PAYOUT,    // goal 1 SUI
+        vector[s(b"a"), s(b"b")],
+        vector[0, 50_000],
+        vector[1_000_000_000, 1_000_000_000], // sum 2 SUI > goal -> abort
+        enc_id, ts::ctx(&mut scenario),
+    );
+    ts::return_to_sender(&scenario, cap);
+    ts::return_shared(reg);
+    ts::end(scenario);
+}
+
+#[test]
+fun test_cancel_project() {
+    let mut scenario = ts::begin(ADMIN);
+    registry::init_for_testing(ts::ctx(&mut scenario));
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let mut reg = ts::take_shared<Registry>(&scenario);
+        project::create_for_testing(&mut reg, 1_000_000_000, 10_000, PAYOUT, ts::ctx(&mut scenario));
+        ts::return_shared(reg);
+    };
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let cap = ts::take_from_sender<AdminCap>(&scenario);
+        let mut proj = ts::take_shared<WaterProject>(&scenario);
+        assert!(!project::is_cancelled(&proj), 0);
+        project::cancel_project(&cap, &mut proj);
+        assert!(project::is_cancelled(&proj), 1);
+        ts::return_to_sender(&scenario, cap);
+        ts::return_shared(proj);
+    };
+    ts::end(scenario);
+}
+
+#[test]
+#[expected_failure(abort_code = project::E_NOT_CANCELLABLE)]
+fun test_cancel_twice_aborts() {
+    let mut scenario = ts::begin(ADMIN);
+    registry::init_for_testing(ts::ctx(&mut scenario));
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let mut reg = ts::take_shared<Registry>(&scenario);
+        project::create_for_testing(&mut reg, 1_000_000_000, 10_000, PAYOUT, ts::ctx(&mut scenario));
+        ts::return_shared(reg);
+    };
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let cap = ts::take_from_sender<AdminCap>(&scenario);
+        let mut proj = ts::take_shared<WaterProject>(&scenario);
+        project::cancel_project(&cap, &mut proj);
+        project::cancel_project(&cap, &mut proj); // already cancelled -> abort
+        ts::return_to_sender(&scenario, cap);
+        ts::return_shared(proj);
+    };
+    ts::end(scenario);
+}

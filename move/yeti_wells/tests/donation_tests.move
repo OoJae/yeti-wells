@@ -4,7 +4,7 @@ module yeti_wells::donation_tests;
 use sui::test_scenario as ts;
 use sui::coin;
 use sui::sui::SUI;
-use yeti_wells::registry::{Self, Registry};
+use yeti_wells::registry::{Self, Registry, AdminCap};
 use yeti_wells::project::{Self, WaterProject};
 use yeti_wells::impact_nft::{Self, ImpactNFT};
 use yeti_wells::donation;
@@ -164,6 +164,83 @@ fun test_donate_again_wrong_project_aborts() {
         let c = coin::mint_for_testing<SUI>(500, ts::ctx(&mut sc));
         donation::donate_again(&mut proj, &mut reg, &mut nft, c, ts::ctx(&mut sc)); // aborts: project mismatch
         impact_nft::burn_for_testing(nft);
+        ts::return_shared(proj);
+        ts::return_shared(reg);
+    };
+    ts::end(sc);
+}
+
+// === Phase 9: SEC-02 refund / cancel ===
+
+fun donor_donates(sc: &mut ts::Scenario, who: address, amount: u64) {
+    ts::next_tx(sc, who);
+    let mut reg = ts::take_shared<Registry>(sc);
+    let mut proj = ts::take_shared<WaterProject>(sc);
+    let c = coin::mint_for_testing<SUI>(amount, ts::ctx(sc));
+    donation::donate(&mut proj, &mut reg, c, ts::ctx(sc));
+    ts::return_shared(proj);
+    ts::return_shared(reg);
+}
+
+#[test]
+fun test_refund_after_cancel_pro_rata() {
+    let mut sc = setup(); // goal 10 SUI, payout PAYOUT; ADMIN holds AdminCap from init
+    donor_donates(&mut sc, ALICE, 4_000_000_000);
+    donor_donates(&mut sc, BOB, 6_000_000_000);
+    // Admin cancels.
+    ts::next_tx(&mut sc, ADMIN);
+    {
+        let cap = ts::take_from_sender<AdminCap>(&sc);
+        let mut proj = ts::take_shared<WaterProject>(&sc);
+        project::cancel_project(&cap, &mut proj);
+        ts::return_to_sender(&sc, cap);
+        ts::return_shared(proj);
+    };
+    // Alice refunds: nothing released, so full 4 SUI back; escrow 10->6, raised 10->6.
+    ts::next_tx(&mut sc, ALICE);
+    {
+        let mut reg = ts::take_shared<Registry>(&sc);
+        let mut proj = ts::take_shared<WaterProject>(&sc);
+        let nft = ts::take_from_sender<ImpactNFT>(&sc);
+        donation::refund(&mut proj, &mut reg, nft, ts::ctx(&mut sc));
+        assert!(project::raised_mist(&proj) == 6_000_000_000, 0);
+        assert!(project::escrow_value(&proj) == 6_000_000_000, 1);
+        assert!(!project::has_donor(&proj, ALICE), 2);
+        ts::return_shared(proj);
+        ts::return_shared(reg);
+    };
+    ts::next_tx(&mut sc, ALICE);
+    {
+        let paid = ts::take_from_sender<coin::Coin<SUI>>(&sc);
+        assert!(coin::value(&paid) == 4_000_000_000, 3);
+        ts::return_to_sender(&sc, paid);
+    };
+    // Bob refunds: 6 SUI * 6/6 = full 6 SUI; escrow -> 0, raised -> 0 (order-independent fairness).
+    ts::next_tx(&mut sc, BOB);
+    {
+        let mut reg = ts::take_shared<Registry>(&sc);
+        let mut proj = ts::take_shared<WaterProject>(&sc);
+        let nft = ts::take_from_sender<ImpactNFT>(&sc);
+        donation::refund(&mut proj, &mut reg, nft, ts::ctx(&mut sc));
+        assert!(project::escrow_value(&proj) == 0, 4);
+        assert!(project::raised_mist(&proj) == 0, 5);
+        ts::return_shared(proj);
+        ts::return_shared(reg);
+    };
+    ts::end(sc);
+}
+
+#[test]
+#[expected_failure(abort_code = donation::E_NOT_CANCELLED)]
+fun test_refund_requires_cancel() {
+    let mut sc = setup();
+    donor_donates(&mut sc, ALICE, 1_000_000_000);
+    ts::next_tx(&mut sc, ALICE);
+    {
+        let mut reg = ts::take_shared<Registry>(&sc);
+        let mut proj = ts::take_shared<WaterProject>(&sc);
+        let nft = ts::take_from_sender<ImpactNFT>(&sc);
+        donation::refund(&mut proj, &mut reg, nft, ts::ctx(&mut sc)); // not cancelled -> abort
         ts::return_shared(proj);
         ts::return_shared(reg);
     };

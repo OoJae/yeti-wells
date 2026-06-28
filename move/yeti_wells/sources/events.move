@@ -38,6 +38,29 @@ public struct MilestoneAttested has copy, drop {
     timestamp_ms: u64,
 }
 
+/// Like `MilestoneAttested` but carries the signing `enclave_id` so verifiers can tell which enclave
+/// (genuine AWS-Nitro vs dev/sim) authorized the release. Emitted alongside `MilestoneAttested`.
+public struct MilestoneAttestedV2 has copy, drop {
+    project_id: ID,
+    milestone_index: u64,
+    liters_reading: u64,
+    released_mist: u64,
+    payout: address,
+    timestamp_ms: u64,
+    enclave_id: ID,
+}
+
+public struct ProjectCancelled has copy, drop {
+    project_id: ID,
+}
+
+public struct RefundEvent has copy, drop {
+    project_id: ID,
+    donor: address,
+    refund_mist: u64,
+    donated_mist: u64,
+}
+
 public(package) fun emit_project_created(
     project_id: ID,
     steward: address,
@@ -84,4 +107,32 @@ public(package) fun emit_milestone_attested(
         payout,
         timestamp_ms,
     });
+}
+
+public(package) fun emit_milestone_attested_v2(
+    project_id: ID,
+    milestone_index: u64,
+    liters_reading: u64,
+    released_mist: u64,
+    payout: address,
+    timestamp_ms: u64,
+    enclave_id: ID,
+) {
+    event::emit(MilestoneAttestedV2 {
+        project_id,
+        milestone_index,
+        liters_reading,
+        released_mist,
+        payout,
+        timestamp_ms,
+        enclave_id,
+    });
+}
+
+public(package) fun emit_project_cancelled(project_id: ID) {
+    event::emit(ProjectCancelled { project_id });
+}
+
+public(package) fun emit_refund(project_id: ID, donor: address, refund_mist: u64, donated_mist: u64) {
+    event::emit(RefundEvent { project_id, donor, refund_mist, donated_mist });
 }

@@ -9,7 +9,6 @@
 module yeti_wells::attestation;
 
 use sui::bcs;
-use sui::ed25519;
 use yeti_wells::registry::{Self, AdminCap, Registry};
 use yeti_wells::project::{Self, WaterProject};
 use yeti_wells::events;
@@ -20,8 +19,9 @@ const E_BAD_SIGNATURE: u64 = 0;
 const E_WRONG_PROJECT: u64 = 1;
 const E_BELOW_THRESHOLD: u64 = 2;
 const E_ALREADY_RELEASED: u64 = 3;
-const E_TRAILING_BYTES: u64 = 4;
 const E_INDEX_OOB: u64 = 5;
+const E_WRONG_ENCLAVE: u64 = 6;
+const E_DEPRECATED: u64 = 7;
 
 /// Intent-scope byte for MilestoneReport signatures — MUST match the enclave/signer side.
 const MILESTONE_INTENT: u8 = 1;
@@ -70,10 +70,41 @@ public fun submit_attested_milestone_v2(
         ),
         E_BAD_SIGNATURE,
     );
-    release_milestone(project, registry, project_id, milestone_index, liters_reading, timestamp_ms, ctx);
+    release_milestone(project, registry, object::id(enc), project_id, milestone_index, liters_reading, timestamp_ms, ctx);
 }
 
-// --- Phase 1: simulated raw-ed25519 path (kept for back-compat) ---
+/// Cap-gated attestation (defense-in-depth, SEC-01): same enclave-signature verification as v2, but only
+/// the platform (holding `AdminCap`) can submit — so even a leaked enclave signature alone cannot move
+/// escrow. The backend uses this path. The enclave signature still proves the reading is TEE-attested.
+public fun submit_attested_milestone_v3(
+    _admin: &AdminCap,
+    project: &mut WaterProject,
+    registry: &mut Registry,
+    enc: &enclave::Enclave<AppWitness>,
+    timestamp_ms: u64,
+    project_id: address,
+    milestone_index: u64,
+    liters_reading: u64,
+    signature: vector<u8>,
+    ctx: &mut TxContext,
+) {
+    let report = MilestoneReport { project_id, milestone_index, liters_reading, timestamp_ms };
+    assert!(
+        enclave::verify_signature<AppWitness, MilestoneReport>(
+            enc,
+            MILESTONE_INTENT,
+            timestamp_ms,
+            report,
+            &signature,
+        ),
+        E_BAD_SIGNATURE,
+    );
+    release_milestone(project, registry, object::id(enc), project_id, milestone_index, liters_reading, timestamp_ms, ctx);
+}
+
+// --- Phase 1: simulated raw-ed25519 path — DEPRECATED (INFO-01). ---
+// Kept only because a public function can't be removed in a compatible upgrade; the body now aborts so the
+// pre-Phase-9 unbound / public-seed raw-ed25519 release path can never be used again.
 
 public fun register_enclave_dev(
     _admin: &AdminCap,
@@ -87,21 +118,14 @@ public fun register_enclave_dev(
 }
 
 public fun submit_attested_milestone(
-    project: &mut WaterProject,
-    registry: &mut Registry,
-    enclave: &Enclave,
-    payload: vector<u8>,
-    signature: vector<u8>,
-    ctx: &mut TxContext,
+    _project: &mut WaterProject,
+    _registry: &mut Registry,
+    _enclave: &Enclave,
+    _payload: vector<u8>,
+    _signature: vector<u8>,
+    _ctx: &mut TxContext,
 ) {
-    assert!(ed25519::ed25519_verify(&signature, &enclave.public_key, &payload), E_BAD_SIGNATURE);
-    let mut reader = bcs::new(payload);
-    let project_id = reader.peel_address();
-    let milestone_index = reader.peel_u64();
-    let liters_reading = reader.peel_u64();
-    let timestamp_ms = reader.peel_u64();
-    assert!(reader.into_remainder_bytes().is_empty(), E_TRAILING_BYTES);
-    release_milestone(project, registry, project_id, milestone_index, liters_reading, timestamp_ms, ctx);
+    abort E_DEPRECATED
 }
 
 // --- shared release path ---
@@ -109,6 +133,7 @@ public fun submit_attested_milestone(
 fun release_milestone(
     project: &mut WaterProject,
     registry: &mut Registry,
+    enclave_obj_id: ID,
     project_id: address,
     milestone_index: u64,
     liters_reading: u64,
@@ -116,11 +141,18 @@ fun release_milestone(
     ctx: &mut TxContext,
 ) {
     assert!(project_id == object::id_address(project), E_WRONG_PROJECT);
+    // SEC-01: the signing enclave MUST be the one bound to this project (at create_project_v2 / set_enclave).
+    // An unbound project (enclave_id == none) can never release — safe by default.
+    assert!(project::enclave_id(project) == option::some(enclave_obj_id), E_WRONG_ENCLAVE);
     assert!(milestone_index < project::milestone_count(project), E_INDEX_OOB);
     assert!(!project::milestone_released(project, milestone_index), E_ALREADY_RELEASED);
     assert!(liters_reading >= project::milestone_threshold(project, milestone_index), E_BELOW_THRESHOLD);
 
-    let release_mist = project::milestone_release(project, milestone_index);
+    // SEC-02 clamp: never abort an under-funded milestone; release whatever escrow holds (the remainder is
+    // reclaimable by donors via `donation::refund` if the project is later cancelled).
+    let nominal = project::milestone_release(project, milestone_index);
+    let avail = project::escrow_value(project);
+    let release_mist = if (nominal <= avail) { nominal } else { avail };
     let coin = project::take_release(project, release_mist, ctx);
     transfer::public_transfer(coin, project::payout(project));
 
@@ -135,6 +167,15 @@ fun release_milestone(
         release_mist,
         project::payout(project),
         timestamp_ms,
+    );
+    events::emit_milestone_attested_v2(
+        object::id(project),
+        milestone_index,
+        liters_reading,
+        release_mist,
+        project::payout(project),
+        timestamp_ms,
+        enclave_obj_id,
     );
 }
 

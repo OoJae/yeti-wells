@@ -8,6 +8,8 @@ public struct AdminCap has key, store {
     id: UID,
 }
 
+const E_UNDERFLOW: u64 = 0;
+
 /// Shared global registry of protocol-wide stats.
 public struct Registry has key {
     id: UID,
@@ -36,6 +38,12 @@ public(package) fun bump_project_count(reg: &mut Registry): u64 {
 
 public(package) fun add_raised(reg: &mut Registry, amount: u64) {
     reg.total_raised_mist = reg.total_raised_mist + amount;
+}
+
+/// Reverse `add_raised` (used by donation::refund when a cancelled project returns escrow).
+public(package) fun sub_raised(reg: &mut Registry, amount: u64) {
+    assert!(reg.total_raised_mist >= amount, E_UNDERFLOW);
+    reg.total_raised_mist = reg.total_raised_mist - amount;
 }
 
 public(package) fun add_delivered(reg: &mut Registry, delta: u64) {

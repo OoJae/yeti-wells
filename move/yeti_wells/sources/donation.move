@@ -14,6 +14,7 @@ const E_ZERO_DONATION: u64 = 0;
 const E_ALREADY_DONATED: u64 = 1;
 const E_NFT_OWNER_MISMATCH: u64 = 2;
 const E_NFT_PROJECT_MISMATCH: u64 = 3;
+const E_NOT_CANCELLED: u64 = 4;
 
 /// First donation by a donor who does NOT yet hold an ImpactNFT for this project.
 /// Mints exactly one soulbound ImpactNFT and records the donor in the project's index.
@@ -65,4 +66,41 @@ public fun donate_again(
         object::id(nft),
         false,
     );
+}
+
+/// Refund a donor's share of REMAINING escrow on a CANCELLED project (SEC-02). Pro-rata of remaining
+/// escrow — milestones already paid out are socialized equally, so this is a share of what's left, NOT
+/// necessarily the full donated amount. Decrementing `raised` and escrow proportionally preserves the
+/// escrow/raised ratio, making the payout order-independent across donors. Consumes (burns) the soulbound
+/// ImpactNFT and removes the donor from the index, so a second refund aborts.
+public fun refund(
+    project: &mut WaterProject,
+    registry: &mut Registry,
+    nft: ImpactNFT,
+    ctx: &mut TxContext,
+) {
+    assert!(project::is_cancelled(project), E_NOT_CANCELLED);
+    let owner = impact_nft::owner(&nft);
+    assert!(owner == ctx.sender(), E_NFT_OWNER_MISMATCH);
+    assert!(impact_nft::project_id(&nft) == project::id(project), E_NFT_PROJECT_MISMATCH);
+
+    let donated = impact_nft::donated_mist(&nft);
+    let escrow = project::escrow_value(project);
+    let raised = project::raised_mist(project);
+    let amt = if (raised == 0) {
+        0
+    } else {
+        (((escrow as u128) * (donated as u128)) / (raised as u128)) as u64
+    };
+
+    project::sub_raised(project, donated);
+    registry::sub_raised(registry, donated);
+    let _ = project::remove_donor(project, owner);
+
+    if (amt > 0) {
+        let coin = project::take_release(project, amt, ctx);
+        transfer::public_transfer(coin, owner);
+    };
+    impact_nft::burn(nft);
+    events::emit_refund(project::id(project), owner, amt, donated);
 }
