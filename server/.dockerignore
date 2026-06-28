@@ -1,0 +1,8 @@
+# BE-02: never bake secrets or local cruft into the image. Secrets come from Railway env vars only.
+.env
+.env.*
+*.local
+node_modules
+npm-debug.log*
+*.log
+.DS_Store

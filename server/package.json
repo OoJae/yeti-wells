@@ -11,7 +11,11 @@
     "@mysten/enoki": "^1.2.0",
     "@mysten/sui": "^2.20.0",
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "p-queue": "^9.3.0",
+    "tsx": "^4.22.4"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
