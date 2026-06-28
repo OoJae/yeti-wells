@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useProject } from "../lib/queries";
 import { walrusBlobUrl } from "../config";
 
-export function EvidenceGallery() {
-  const { project } = useProject();
+export function EvidenceGallery({ projectId }: { projectId: string }) {
+  const { project } = useProject(projectId);
   const evidence = project?.evidence ?? [];
 
   return (
@@ -30,12 +30,21 @@ export function EvidenceGallery() {
                 className="group block overflow-hidden rounded-lg border bg-card"
                 title={e.caption}
               >
-                <img
-                  src={walrusBlobUrl(e.blobId)}
-                  alt={e.caption}
-                  loading="lazy"
-                  className="h-28 w-full bg-secondary object-cover transition-transform duration-300 group-hover:scale-105"
-                />
+                {(e.mediaType ?? "").startsWith("image/") ? (
+                  <img
+                    src={walrusBlobUrl(e.blobId)}
+                    alt={e.caption}
+                    loading="lazy"
+                    onError={(ev) => {
+                      (ev.currentTarget as HTMLImageElement).style.visibility = "hidden";
+                    }}
+                    className="h-28 w-full bg-secondary object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-28 w-full items-center justify-center bg-secondary text-xs text-muted-foreground">
+                    {e.mediaType || "file"} ↗
+                  </div>
+                )}
                 <div className="space-y-0.5 p-2">
                   <div className="line-clamp-2 text-xs text-foreground">{e.caption}</div>
                   <div className="flex items-center justify-between text-[10px] text-muted-foreground">

@@ -8,10 +8,10 @@ import { suiToMist } from "../lib/format";
 
 const PRESETS = [0.05, 0.1, 0.2];
 
-export function DonatePanel() {
+export function DonatePanel({ projectId }: { projectId: string }) {
   const { account, signIn, canSignIn } = useGoogleAuth();
   const funding = useAutoFund();
-  const { nft } = useMyNft();
+  const { nft } = useMyNft(projectId);
   const donate = useDonate();
   const qc = useQueryClient();
 
@@ -31,7 +31,7 @@ export function DonatePanel() {
     setStatus("pending");
     setMsg("");
     try {
-      const digest = await donate(suiToMist(amount), nft?.id);
+      const digest = await donate(projectId, suiToMist(amount), nft?.id);
       setStatus("done");
       setMsg(digest);
       qc.invalidateQueries();

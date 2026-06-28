@@ -17,7 +17,11 @@ export function useDonate() {
   const account = useCurrentAccount();
   const { mutateAsync: signTransaction } = useSignTransaction();
 
-  return async function donate(amountMist: bigint, existingNftId?: string | null): Promise<string> {
+  return async function donate(
+    projectId: string,
+    amountMist: bigint,
+    existingNftId?: string | null,
+  ): Promise<string> {
     if (!account) throw new Error("Sign in first");
 
     const { data: coins } = await client.getCoins({ owner: account.address, coinType: SUI_TYPE });
@@ -42,12 +46,12 @@ export function useDonate() {
     if (existingNftId) {
       tx.moveCall({
         target: DONATE_AGAIN_TARGET,
-        arguments: [tx.object(config.waterProjectId), tx.object(config.registryId), tx.object(existingNftId), payment],
+        arguments: [tx.object(projectId), tx.object(config.registryId), tx.object(existingNftId), payment],
       });
     } else {
       tx.moveCall({
         target: DONATE_TARGET,
-        arguments: [tx.object(config.waterProjectId), tx.object(config.registryId), payment],
+        arguments: [tx.object(projectId), tx.object(config.registryId), payment],
       });
     }
 

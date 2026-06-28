@@ -2,25 +2,25 @@ import { Transaction } from "@mysten/sui/transactions";
 import { useSuiClient, useCurrentAccount, useSignTransaction } from "@mysten/dapp-kit";
 import { toBase64 } from "@mysten/sui/utils";
 import { execute, sponsor } from "./api";
-import { SYNC_TARGET } from "../config";
+import { config, REFUND_TARGET } from "../config";
 
 /**
- * Gasless `sync_impact`: recompute the donor's NFT (liters/xp/tier) from the project's on-chain truth.
- * Same sponsor → sign → execute flow as donate, but no coin/payment. zkLogin signs silently (no popup).
+ * Gasless refund on a CANCELLED campaign: returns the donor's share of remaining escrow and burns the
+ * soulbound NFT. Same sponsor -> sign -> execute flow as donate. The NFT is consumed by value on-chain.
  */
-export function useSyncImpact() {
+export function useRefund() {
   const client = useSuiClient();
   const account = useCurrentAccount();
   const { mutateAsync: signTransaction } = useSignTransaction();
 
-  return async function sync(nftId: string, projectId: string): Promise<string> {
+  return async function refund(projectId: string, nftId: string): Promise<string> {
     if (!account) throw new Error("Sign in first");
 
     const tx = new Transaction();
     tx.setSender(account.address);
     tx.moveCall({
-      target: SYNC_TARGET,
-      arguments: [tx.object(nftId), tx.object(projectId)],
+      target: REFUND_TARGET,
+      arguments: [tx.object(projectId), tx.object(config.registryId), tx.object(nftId)],
     });
 
     const kindBytes = await tx.build({ client, onlyTransactionKind: true });

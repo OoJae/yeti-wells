@@ -1,26 +1,27 @@
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Header } from "./components/Header";
-import { Landing } from "./components/Landing";
-import { ProjectCard } from "./components/ProjectCard";
-import { ImpactNftCard } from "./components/ImpactNftCard";
-import { EvidenceGallery } from "./components/EvidenceGallery";
-import { StewardPanel } from "./components/StewardPanel";
-
-const isSteward =
-  typeof window !== "undefined" && new URLSearchParams(window.location.search).get("steward") === "1";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { CampaignsBrowse } from "./pages/CampaignsBrowse";
+import { ProjectDetail } from "./pages/ProjectDetail";
+import { CreateCampaign } from "./pages/CreateCampaign";
+import { DonorDashboard } from "./pages/DonorDashboard";
 
 export default function App() {
   return (
     <div className="min-h-screen">
       <Header />
-      <Landing />
-      <main className="mx-auto max-w-5xl space-y-6 px-4 pb-16">
-        <div className="grid items-start gap-6 md:grid-cols-2">
-          <ProjectCard />
-          <ImpactNftCard />
-        </div>
-        <EvidenceGallery />
-        {isSteward && <StewardPanel />}
-      </main>
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/" element={<CampaignsBrowse />} />
+          <Route path="/c/:projectId" element={<ProjectDetail />} />
+          <Route path="/create" element={<CreateCampaign />} />
+          <Route path="/me" element={<DonorDashboard />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ErrorBoundary>
+      <footer className="border-t py-8 text-center text-xs text-muted-foreground">
+        Yeti Wells · verifiable proof-of-impact giving on Sui · escrow released only on TEE-attested delivery
+      </footer>
     </div>
   );
 }

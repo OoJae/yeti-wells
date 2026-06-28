@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ShieldCheck } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { addEvidence, runAttestation } from "../lib/api";
+import { addEvidence, runAttestation, cancelCampaign } from "../lib/api";
 
 function fileToBase64(file: File): Promise<{ base64: string; mediaType: string }> {
   return new Promise((resolve, reject) => {
@@ -20,7 +20,7 @@ function fileToBase64(file: File): Promise<{ base64: string; mediaType: string }
   });
 }
 
-export function StewardPanel() {
+export function StewardPanel({ projectId }: { projectId: string }) {
   const qc = useQueryClient();
   const [stewardKey, setStewardKey] = useState(() => localStorage.getItem("yw_steward_key") ?? "");
 
@@ -45,7 +45,10 @@ export function StewardPanel() {
     try {
       saveKey();
       const { base64, mediaType } = await fileToBase64(file);
-      const r = await addEvidence({ dataBase64: base64, mediaType, caption, milestoneIndex: milestone }, stewardKey);
+      const r = await addEvidence(
+        { projectId, dataBase64: base64, mediaType, caption, milestoneIndex: milestone },
+        stewardKey,
+      );
       setEvStatus("done");
       setEvMsg(r.blobId);
       setFile(null);
@@ -57,12 +60,30 @@ export function StewardPanel() {
     }
   };
 
+  const [cancelStatus, setCancelStatus] = useState<"idle" | "running" | "done" | "error">("idle");
+  const [cancelMsg, setCancelMsg] = useState("");
+  const onCancel = async () => {
+    if (!confirm("Cancel this campaign? Donors will be able to reclaim their share of remaining escrow.")) return;
+    setCancelStatus("running");
+    setCancelMsg("");
+    try {
+      saveKey();
+      const r = await cancelCampaign(projectId, stewardKey);
+      setCancelStatus("done");
+      setCancelMsg(r.digest);
+      qc.invalidateQueries();
+    } catch (e) {
+      setCancelStatus("error");
+      setCancelMsg(e instanceof Error ? e.message : String(e));
+    }
+  };
+
   const onAttest = async () => {
     setAttStatus("running");
     setAttMsg("");
     try {
       saveKey();
-      const r = await runAttestation(attMilestone, stewardKey);
+      const r = await runAttestation(projectId, attMilestone, stewardKey);
       setAttStatus("done");
       setAttMsg(`${r.source} · ${r.litersReading.toLocaleString()} L · ${r.digest.slice(0, 10)}…`);
       qc.invalidateQueries();
@@ -143,6 +164,25 @@ export function StewardPanel() {
             <p className="text-xs text-sui">✅ Stored on Walrus — blob {evMsg.slice(0, 10)}… recorded on-chain</p>
           )}
           {evStatus === "error" && <p className="break-all text-xs text-destructive-foreground">{evMsg}</p>}
+        </div>
+
+        {/* Cancel campaign -> enables donor refunds */}
+        <div className="space-y-2 border-t pt-4">
+          <div className="text-sm font-medium">Cancel campaign</div>
+          <p className="text-xs text-muted-foreground">
+            Marks the campaign cancelled so donors can reclaim their share of remaining escrow. Irreversible.
+          </p>
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={!stewardKey}
+            loading={cancelStatus === "running"}
+            onClick={onCancel}
+          >
+            {cancelStatus === "running" ? "Cancelling…" : "Cancel campaign"}
+          </Button>
+          {cancelStatus === "done" && <p className="text-xs text-sui">✅ Cancelled — {cancelMsg.slice(0, 10)}…</p>}
+          {cancelStatus === "error" && <p className="break-all text-xs text-destructive-foreground">{cancelMsg}</p>}
         </div>
       </CardContent>
     </Card>

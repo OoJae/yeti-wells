@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useQueryClient } from "@tanstack/react-query";
-import { ShieldCheck, Share2, Loader2 } from "lucide-react";
+import { ShieldCheck, ShieldQuestion, Share2, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { WaterGlobe } from "./WaterGlobe";
-import { useMyNft, useProject } from "../lib/queries";
+import { useMyNft, useProject, useLatestAttestationV2 } from "../lib/queries";
 import { useSyncImpact } from "../lib/useSyncImpact";
 import { computeImpact, tierRange } from "../lib/impact";
 import { config, TIER_LABELS } from "../config";
@@ -18,49 +18,37 @@ function TierBar({ percent }: { percent: number }) {
   );
 }
 
-/** Latest TEE attestation tx for the project, for the "Verified by TEE" link. */
-function useLatestAttestation() {
-  const q = useSuiClientQuery(
-    "queryEvents",
-    {
-      query: { MoveEventType: `${config.packageId}::events::MilestoneAttested` },
-      limit: 1,
-      order: "descending",
-    },
-    { refetchInterval: 8000 },
-  );
-  return q.data?.data?.[0]?.id?.txDigest as string | undefined;
-}
-
-export function ImpactNftCard() {
+export function ImpactNftCard({ projectId }: { projectId: string }) {
   const account = useCurrentAccount();
-  const { nft } = useMyNft();
-  const { project } = useProject();
+  const { nft } = useMyNft(projectId);
+  const { project } = useProject(projectId);
   const syncImpact = useSyncImpact();
   const qc = useQueryClient();
-  const attestationTx = useLatestAttestation();
+  const { txDigest: attestationTx, enclaveId: attEnclave } = useLatestAttestationV2(projectId);
 
   const [syncing, setSyncing] = useState(false);
   const lastKey = useRef("");
+  const failedKeys = useRef<Set<string>>(new Set());
 
-  // Auto-sync: when the on-chain NFT lags the computed truth (just donated, or delivered liters grew),
-  // run a silent sponsored sync_impact once per (nft, delivered, raised). This is the "water rises" magic.
+  // Auto-sync only when on-chain is STALE-LOW (delivered grew): on-chain liters_attributed is monotonic, so
+  // a later diluting donation never needs a sync-down. FE-04: a hard failure is remembered (no retry loop).
   useEffect(() => {
     if (!nft || !project || !account) return;
     const computed = computeImpact(project, nft.donatedMist);
-    const key = `${nft.id}:${project.deliveredLiters}:${project.raisedMist}`;
-    if (computed.attributed !== BigInt(nft.litersAttributed) && lastKey.current !== key) {
+    const key = `${nft.id}:${project.deliveredLiters}`;
+    if (computed.attributed > BigInt(nft.litersAttributed) && lastKey.current !== key && !failedKeys.current.has(key)) {
       lastKey.current = key;
       setSyncing(true);
-      syncImpact(nft.id)
+      syncImpact(nft.id, projectId)
         .then(() => qc.invalidateQueries())
-        .catch(() => {
-          lastKey.current = ""; // allow retry on failure
+        .catch((e) => {
+          failedKeys.current.add(key); // don't loop on a persistent failure
+          console.warn("auto-sync failed", e);
         })
         .finally(() => setSyncing(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nft?.id, nft?.litersAttributed, project?.deliveredLiters, project?.raisedMist, account?.address]);
+  }, [nft?.id, nft?.litersAttributed, project?.deliveredLiters, account?.address]);
 
   // Signed-out / before first donation: show the empty globe.
   if (!nft || !project) {
@@ -83,8 +71,14 @@ export function ImpactNftCard() {
 
   const c = computeImpact(project, nft.donatedMist);
   const { to } = tierRange(c.tier);
-  const shareText = `I'm funding verifiable clean water with Yeti Wells on Sui — ${Number(c.attributed).toLocaleString()} liters delivered on my behalf, proven by a TEE. 🧊💧`;
-  const shareHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.origin)}`;
+  // ECON-02 display: never show LESS than the monotonic on-chain value (a later donor must not visibly un-fill us).
+  const attributed = c.attributed > BigInt(nft.litersAttributed) ? c.attributed : BigInt(nft.litersAttributed);
+  // FE-02: only a milestone attested by the genuine (PCR-verified) enclave is "Verified by TEE (AWS Nitro)".
+  const genuine = !!config.genuineEnclaveId && attEnclave === config.genuineEnclaveId;
+  const shareText = `I'm funding ${project.name} with Yeti Wells on Sui — ${Number(attributed).toLocaleString()} liters of clean water delivered on my behalf, on-chain. 🧊💧 Join me:`;
+  // Referral deep link to this campaign (carries the donor's address as ?ref=).
+  const campaignUrl = `${window.location.origin}/c/${projectId}?ref=${account?.address ?? ""}`;
+  const shareHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(campaignUrl)}`;
 
   return (
     <Card>
@@ -127,26 +121,39 @@ export function ImpactNftCard() {
             <div className="text-[10px] text-muted-foreground">SUI donated</div>
           </div>
           <div className="rounded-lg border bg-card/50 p-2">
-            <div className="text-sm font-semibold tabular-nums text-sui">{Number(c.attributed).toLocaleString()}</div>
+            <div className="text-sm font-semibold tabular-nums text-sui">{Number(attributed).toLocaleString()}</div>
             <div className="text-[10px] text-muted-foreground">liters attributed</div>
           </div>
           <div className="rounded-lg border bg-card/50 p-2">
-            <div className="text-sm font-semibold tabular-nums">{Number(c.xp).toLocaleString()}</div>
+            <div className="text-sm font-semibold tabular-nums">{Number(attributed).toLocaleString()}</div>
             <div className="text-[10px] text-muted-foreground">XP</div>
           </div>
         </div>
 
-        {/* Badges + share */}
+        {/* Badges + share — provenance-aware (FE-02): genuine TEE vs demo signer */}
         <div className="flex flex-wrap items-center justify-between gap-2">
           {Number(project.deliveredLiters) > 0 ? (
-            <a
-              href={attestationTx ? `https://suiscan.xyz/testnet/tx/${attestationTx}` : `https://suiscan.xyz/testnet/object/${config.waterProjectId}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-sui/15 px-2.5 py-1 text-xs font-medium text-sui hover:bg-sui/25"
-            >
-              <ShieldCheck className="h-3.5 w-3.5" /> Verified by TEE
-            </a>
+            genuine ? (
+              <a
+                href={attestationTx ? `https://suiscan.xyz/testnet/tx/${attestationTx}` : `https://suiscan.xyz/testnet/object/${projectId}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full bg-sui/15 px-2.5 py-1 text-xs font-medium text-sui hover:bg-sui/25"
+                title="Released after a genuine AWS-Nitro TEE attestation"
+              >
+                <ShieldCheck className="h-3.5 w-3.5" /> Verified by TEE (AWS Nitro)
+              </a>
+            ) : (
+              <a
+                href={attestationTx ? `https://suiscan.xyz/testnet/tx/${attestationTx}` : `https://suiscan.xyz/testnet/object/${projectId}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-600 hover:bg-amber-500/25"
+                title="Released by the demo signer in this deployment (not genuine TEE hardware). The on-chain ed25519 verification is real; the signing key is a software key for the judging window."
+              >
+                <ShieldQuestion className="h-3.5 w-3.5" /> Released (demo signer)
+              </a>
+            )
           ) : (
             <span className="rounded-full bg-secondary px-2.5 py-1 text-xs text-muted-foreground">Awaiting attestation</span>
           )}
