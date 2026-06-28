@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Expanded:wght@500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html{-webkit-font-smoothing:antialiased;}
+  body{margin:0;background:#04070D;overflow-x:hidden;}
+  ::selection{background:#5CC8FF;color:#04070D;}
+  @keyframes mIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  [data-in]{animation:mIn .7s cubic-bezier(.16,1,.3,1) both;}
+  @media (max-width:620px){ [data-appnav]{display:none!important;} [data-stats]{grid-template-columns:1fr 1fr!important;} }
+  @media (prefers-reduced-motion:reduce){[data-in]{animation:none!important;}}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="--deep:#04070D;--deep2:#080D17;--surface:#0B1320;--surface2:#0E1726;--line:#172333;--ink:#E9F4FF;--dim:#7E92A8;--dim2:#566678;--water:#5CC8FF;--frost:#9EE6FF;--water2:#1C6CB2;--brass:#E7B777;position:relative;min-height:100vh;background:var(--deep);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;">
+
+  <div aria-hidden="true" style="position:fixed;inset:0 0 auto 0;height:460px;pointer-events:none;z-index:0;background:radial-gradient(70% 100% at 50% -10%,rgba(28,108,178,.18),transparent 62%);"></div>
+
+  <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px clamp(16px,3.5vw,40px);background:rgba(4,7,13,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);">
+    <a href="Yeti Wells - Landing.dc.html" style="display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink);">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#0B1320" stroke="#1F2E42"></circle><clipPath id="mnav"><circle cx="16" cy="16" r="13.2"></circle></clipPath><g clip-path="url(#mnav)"><rect x="0" y="17.5" width="32" height="16" fill="#1C6CB2"></rect><rect x="0" y="17.5" width="32" height="2.4" fill="#5CC8FF"></rect><ellipse cx="16" cy="16.2" rx="5.7" ry="6.3" fill="#EAF6FF"></ellipse><circle cx="13.8" cy="15" r="1.05" fill="#0A1622"></circle><circle cx="18.2" cy="15" r="1.05" fill="#0A1622"></circle><path d="M14.2 18.3 Q16 19.6 17.8 18.3" stroke="#0A1622" stroke-width="0.7" fill="none" stroke-linecap="round"></path></g></svg>
+      <span style="font-family:'Space Mono',monospace;font-weight:700;font-size:13px;letter-spacing:.14em;">YETI&nbsp;WELLS</span>
+    </a>
+    <nav data-appnav style="display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.04em;">
+      <a href="Yeti Wells - Browse.dc.html" style="color:var(--dim);text-decoration:none;padding:7px 14px;border-radius:3px;" onmouseover="this.style.color='#E9F4FF'" onmouseout="this.style.color='#7E92A8'">Campaigns</a>
+      <span style="color:var(--ink);background:rgba(92,200,255,.1);border:1px solid rgba(92,200,255,.28);padding:7px 14px;border-radius:3px;">My Impact</span>
+    </nav>
+    <span style="display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:12px;color:var(--dim);background:var(--surface);border:1px solid var(--line);padding:6px 10px;border-radius:3px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--water);box-shadow:0 0 8px var(--water);"></span>0x5282…0ce6</span>
+  </header>
+
+  <main style="position:relative;z-index:5;max-width:1180px;margin:0 auto;padding:clamp(28px,4vw,52px) clamp(16px,3.5vw,40px) 64px;">
+
+    <div data-in style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:30px;">
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--water);margin-bottom:13px;">YOUR&nbsp;SOULBOUND&nbsp;COLLECTION</div>
+        <h1 style="font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:clamp(2rem,4.2vw,3.2rem);line-height:1.0;letter-spacing:-.03em;margin:0 0 12px;">Your impact, alive on-chain.</h1>
+        <p style="margin:0;color:var(--dim);font-size:1.04rem;line-height:1.55;max-width:52ch;">One soulbound Impact NFT for every campaign you've funded. Each fills with verified water as proven liters arrive — they rise, but never drain.</p>
+      </div>
+      <button onClick="{{ onShare }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:'Archivo',sans-serif;font-weight:600;font-size:14px;color:var(--deep);background:var(--ink);border:none;padding:12px 18px;border-radius:3px;white-space:nowrap;transition:transform .25s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">{{ shareLabel }}</button>
+    </div>
+
+    <div data-stats data-in style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:36px;">
+      <div style="border:1px solid var(--line);border-radius:10px;padding:20px;background:var(--surface);">
+        <div style="font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:clamp(1.6rem,3vw,2.3rem);letter-spacing:-.02em;">0.45</div>
+        <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--dim);margin-top:5px;">SUI&nbsp;DONATED</div>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:20px;background:var(--surface);">
+        <div style="font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:clamp(1.6rem,3vw,2.3rem);letter-spacing:-.02em;color:var(--water);">33,717</div>
+        <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--dim);margin-top:5px;">LITERS&nbsp;ATTRIBUTED</div>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:20px;background:var(--surface);">
+        <div style="font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:clamp(1.6rem,3vw,2.3rem);letter-spacing:-.02em;">5</div>
+        <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--dim);margin-top:5px;">CAMPAIGNS&nbsp;FUNDED</div>
+      </div>
+      <div style="border:1px solid rgba(158,230,255,.28);border-radius:10px;padding:20px;background:linear-gradient(160deg,rgba(158,230,255,.08),var(--surface));">
+        <div style="font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:clamp(1.6rem,3vw,2.3rem);letter-spacing:-.02em;color:var(--frost);">Glacier</div>
+        <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--dim);margin-top:5px;">HIGHEST&nbsp;TIER</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:18px;">
+      <sc-for list="{{ nfts }}" as="c" hint-placeholder-count="5">
+        <a href="Yeti Wells - Campaign.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:14px;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:12px;padding:22px 20px;background:var(--surface);transition:transform .25s cubic-bezier(.16,1,.3,1),border-color .25s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(92,200,255,.42)'" onmouseout="this.style.transform='none';this.style.borderColor='#172333'">
+          <div style="position:relative;width:150px;height:150px;">
+            <canvas data-globe data-fill="{{ c.level }}" data-seed="{{ c.seed }}" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+            <div style="position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:10px;color:{{ c.tierColor }};background:rgba(4,7,13,.6);padding:2px 8px;border-radius:999px;white-space:nowrap;">{{ c.tierLabel }}</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1rem;letter-spacing:-.01em;line-height:1.1;">{{ c.name }}</div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);margin-top:4px;">{{ c.location }}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;border-top:1px solid var(--line);padding-top:14px;">
+            <div style="text-align:center;">
+              <div style="font-family:'Archivo',sans-serif;font-weight:700;font-size:.92rem;">{{ c.donated }}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim2);margin-top:2px;">SUI</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-family:'Archivo',sans-serif;font-weight:700;font-size:.92rem;color:var(--water);">{{ c.attributed }}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim2);margin-top:2px;">LITERS</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-family:'Archivo',sans-serif;font-weight:700;font-size:.92rem;">{{ c.fillText }}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim2);margin-top:2px;">FILLED</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:10px;color:{{ c.teeColor }};">{{ c.teeLabel }}</div>
+        </a>
+      </sc-for>
+    </div>
+  </main>
+
+  <footer style="position:relative;z-index:5;border-top:1px solid var(--line);padding:22px clamp(16px,3.5vw,40px);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--dim2);">
+    <span style="color:var(--ink);">Every drop, <span style="color:var(--water);">provable.</span></span>
+    <span>MOVE&nbsp;·&nbsp;zkLOGIN&nbsp;·&nbsp;ENOKI&nbsp;·&nbsp;WALRUS&nbsp;·&nbsp;NAUTILUS&nbsp;·&nbsp;TESTNET</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:820}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.rootRef = React.createRef();
+    this.phase = 0; this.bubbles = []; this.reduced = false;
+    this.state = { copied:false };
+    this.nfts = [
+      { name:'Kibera Borehole №1', location:'Nairobi, KE', donated:'0.05', attributed:'9,090', fill:100, tier:'River', tee:'aws' },
+      { name:'Rooftop Rainwater', location:'Kakuma, KE', donated:'0.20', attributed:'10,769', fill:52, tier:'Glacier', tee:'demo' },
+      { name:'Solar Water Kiosk', location:'Accra, GH', donated:'0.10', attributed:'6,197', fill:44, tier:'River', tee:'demo' },
+      { name:'School Tubewell', location:'Sylhet, BD', donated:'0.05', attributed:'4,090', fill:100, tier:'River', tee:'demo' },
+      { name:'Gravity Filters', location:'Cusco, PE', donated:'0.05', attributed:'3,571', fill:100, tier:'River', tee:'demo' },
+    ];
+  }
+
+  componentDidMount(){
+    try { this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){ this.reduced = false; }
+    for(let i=0;i<14;i++){ this.bubbles.push({ a:Math.random()*Math.PI*2, rr:Math.random(), y:Math.random(), r:0.5+Math.random()*1.8, sp:0.0016+Math.random()*0.003 }); }
+    this._onResize = () => this.drawAll(true);
+    window.addEventListener('resize', this._onResize, { passive:true });
+    this.drawAll(true);
+    this._raf = requestAnimationFrame(this.loop);
+    this._iv = setInterval(this.tick, 90);
+  }
+  componentWillUnmount(){
+    cancelAnimationFrame(this._raf);
+    if(this._iv) clearInterval(this._iv);
+    window.removeEventListener('resize', this._onResize);
+  }
+
+  tick = () => {
+    try { if(!this.reduced) this.phase += 0.02; this.drawAll(false); }
+    catch(e){ if(typeof window!=='undefined') window.__mErr=(e&&e.message)||String(e); }
+  }
+  loop = () => { this.tick(); this._raf = requestAnimationFrame(this.loop); }
+
+  drawAll(resize){
+    const root = this.rootRef.current; if(!root) return;
+    const globes = root.querySelectorAll('[data-globe]');
+    globes.forEach(c=>this.drawGlobe(c, resize));
+  }
+
+  drawGlobe(canvas, resize){
+    let m = canvas._yw;
+    const dpr = Math.min(window.devicePixelRatio||1, 2);
+    const w = canvas.clientWidth||1, h = canvas.clientHeight||1;
+    if(resize || !m || m.w!==w || m.h!==h){
+      canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);
+      const ctx = canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+      m = canvas._yw = { ctx, w, h };
+    }
+    const ctx = m.ctx, W = m.w, H = m.h;
+    const fillPct = parseFloat(canvas.dataset.fill)||0;
+    const seed = parseFloat(canvas.dataset.seed)||0;
+    const level = Math.max(0.1, Math.min(0.94, fillPct/100*0.94));
+    const phase = this.phase + seed;
+    ctx.clearRect(0,0,W,H);
+    const cx = W/2, cy = H/2, R = Math.min(W,H)/2 - 3;
+
+    const og = ctx.createRadialGradient(cx,cy,R*0.6, cx,cy,R*1.3);
+    og.addColorStop(0,'rgba(40,130,200,0.22)'); og.addColorStop(1,'rgba(40,130,200,0)');
+    ctx.fillStyle = og; ctx.beginPath(); ctx.arc(cx,cy,R*1.3,0,Math.PI*2); ctx.fill();
+
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
+    const base = ctx.createLinearGradient(0,cy-R,0,cy+R);
+    base.addColorStop(0,'rgba(18,28,44,0.7)'); base.addColorStop(1,'rgba(6,11,20,0.92)');
+    ctx.fillStyle = base; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+
+    const waterTop = (cy+R) - level*(2*R);
+    const wg = ctx.createLinearGradient(0,waterTop,0,cy+R);
+    wg.addColorStop(0,'#7FD8FF'); wg.addColorStop(0.14,'#5CC8FF'); wg.addColorStop(0.6,'#2C86C8'); wg.addColorStop(1,'#103E66');
+    const amp = this.reduced ? 0 : 4;
+    ctx.beginPath(); ctx.moveTo(cx-R, waterTop);
+    for(let x=-R;x<=R;x+=6){ const xn=(x+R)/(2*R); const y = waterTop + Math.sin(xn*Math.PI*3 + phase)*amp + Math.sin(xn*Math.PI*7 - phase*1.3)*amp*0.4; ctx.lineTo(cx+x, y); }
+    ctx.lineTo(cx+R, cy+R); ctx.lineTo(cx-R, cy+R); ctx.closePath();
+    ctx.fillStyle = wg; ctx.fill();
+    ctx.beginPath();
+    for(let x=-R;x<=R;x+=6){ const xn=(x+R)/(2*R); const y = waterTop + Math.sin(xn*Math.PI*3 + phase)*amp + Math.sin(xn*Math.PI*7 - phase*1.3)*amp*0.4; if(x===-R) ctx.moveTo(cx+x,y); else ctx.lineTo(cx+x,y); }
+    ctx.strokeStyle='rgba(220,245,255,0.7)'; ctx.lineWidth=1.3; ctx.stroke();
+
+    this.bubbles.forEach(b=>{ const by = (cy+R) - (((b.y + seed*0.13)%1))*((cy+R)-waterTop); const bx = cx + Math.cos(b.a+seed)*R*0.62*(b.rr); if(by>waterTop+2 && (bx-cx)*(bx-cx)+(by-cy)*(by-cy) < R*R*0.9){ ctx.beginPath(); ctx.arc(bx,by,b.r,0,Math.PI*2); ctx.fillStyle='rgba(225,245,255,0.3)'; ctx.fill(); } });
+    if(!this.reduced) this.bubbles.forEach(b=>{ b.y -= b.sp; if(b.y<0) b.y=1; });
+
+    this.drawYeti(ctx, cx, waterTop, R, phase);
+
+    const is = ctx.createRadialGradient(cx,cy,R*0.55, cx,cy,R);
+    is.addColorStop(0,'rgba(0,0,0,0)'); is.addColorStop(1,'rgba(0,0,0,0.4)');
+    ctx.fillStyle=is; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+    const sp = ctx.createRadialGradient(cx-R*0.4,cy-R*0.5,1, cx-R*0.4,cy-R*0.5,R*0.9);
+    sp.addColorStop(0,'rgba(255,255,255,0.22)'); sp.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=sp; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.strokeStyle='rgba(92,200,255,0.18)'; ctx.lineWidth=5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.strokeStyle='rgba(200,230,255,0.55)'; ctx.lineWidth=1.4; ctx.stroke();
+  }
+
+  drawYeti(ctx, cx, surfaceY, R, phase){
+    const r = R*0.26;
+    const bob = this.reduced ? 0 : Math.sin(phase)*3;
+    const cyy = surfaceY - r*0.16 + bob;
+    const tilt = this.reduced ? 0 : Math.sin(phase*0.7)*0.05;
+    ctx.save(); ctx.translate(cx, cyy); ctx.rotate(tilt);
+    ctx.fillStyle='#EDF6FF';
+    ctx.beginPath(); ctx.ellipse(-r*0.6,-r*0.7,r*0.26,r*0.3,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(r*0.6,-r*0.7,r*0.26,r*0.3,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0,0,r*0.95,r*1.06,0,0,Math.PI*2); ctx.fillStyle='#EDF6FF'; ctx.fill();
+    const rim = ctx.createRadialGradient(-r*0.3,-r*0.3,1,-r*0.3,-r*0.3,r*1.1);
+    rim.addColorStop(0,'rgba(255,255,255,0.5)'); rim.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.beginPath(); ctx.ellipse(-r*0.18,-r*0.12,r*0.7,r*0.8,0,0,Math.PI*2); ctx.fillStyle=rim; ctx.fill();
+    ctx.fillStyle='#0A1622';
+    ctx.beginPath(); ctx.ellipse(-r*0.34,-r*0.06,r*0.12,r*0.16,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(r*0.34,-r*0.06,r*0.12,r*0.16,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.85)';
+    ctx.beginPath(); ctx.arc(-r*0.3,-r*0.12,r*0.04,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(r*0.38,-r*0.12,r*0.04,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#0A1622'; ctx.lineWidth=Math.max(1.1,r*0.05); ctx.lineCap='round';
+    ctx.beginPath(); ctx.arc(0,r*0.12,r*0.32,0.18*Math.PI,0.82*Math.PI); ctx.stroke();
+    ctx.fillStyle='rgba(120,200,255,0.35)';
+    ctx.beginPath(); ctx.arc(-r*0.5,r*0.16,r*0.12,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(r*0.5,r*0.16,r*0.12,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.rect(-r*1.2, r*0.18 - bob, r*2.4, r*2.2); ctx.clip();
+    ctx.beginPath(); ctx.ellipse(0,0,r*0.97,r*1.08,0,0,Math.PI*2); ctx.fillStyle='rgba(60,150,220,0.32)'; ctx.fill();
+    ctx.restore(); ctx.restore();
+  }
+
+  renderVals(){
+    const seeds = [0,1.3,2.6,3.9,5.2];
+    const nfts = this.nfts.map((n,i)=>({
+      name:n.name, location:n.location, donated:n.donated, attributed:n.attributed,
+      level: String(n.fill), seed: String(seeds[i] || i*1.3),
+      fillText: n.fill+'%',
+      tierLabel: n.tier, tierColor: n.tier==='Glacier' ? '#9EE6FF' : '#5CC8FF',
+      teeLabel: n.tee==='aws' ? '✓ Verified by TEE (AWS Nitro)' : '✓ Released (demo signer)',
+      teeColor: n.tee==='aws' ? '#E7B777' : '#5CC8FF'
+    }));
+    return {
+      rootRef: this.rootRef,
+      nfts,
+      shareLabel: this.state.copied ? '✓ Link copied' : '⤴ Share my impact',
+      onShare: ()=>{ this.setState({ copied:true }); setTimeout(()=>this.setState({ copied:false }), 1600); }
+    };
+  }
+}
+</script>
+</body>
+</html>

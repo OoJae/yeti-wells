@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Expanded:wght@500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html{-webkit-font-smoothing:antialiased;}
+  body{margin:0;background:#04070D;overflow-x:hidden;}
+  ::selection{background:#5CC8FF;color:#04070D;}
+  input,textarea{font-family:'Archivo',sans-serif;}
+  input::placeholder,textarea::placeholder{color:#566678;}
+  input:focus,textarea:focus{outline:none;border-color:#5CC8FF!important;}
+  input[type=number]{-moz-appearance:textfield;}
+  @keyframes kIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  [data-in]{animation:kIn .7s cubic-bezier(.16,1,.3,1) both;}
+  @media (max-width:880px){ [data-2col]{grid-template-columns:1fr!important;} [data-preview]{position:static!important;} }
+  @media (max-width:620px){ [data-appnav]{display:none!important;} }
+  @media (prefers-reduced-motion:reduce){[data-in]{animation:none!important;}}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="--deep:#04070D;--deep2:#080D17;--surface:#0B1320;--surface2:#0E1726;--line:#172333;--ink:#E9F4FF;--dim:#7E92A8;--dim2:#566678;--water:#5CC8FF;--water2:#1C6CB2;--brass:#E7B777;--bad:#E8856B;position:relative;min-height:100vh;background:var(--deep);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;">
+
+  <div aria-hidden="true" style="position:fixed;inset:0 0 auto 0;height:420px;pointer-events:none;z-index:0;background:radial-gradient(72% 100% at 28% -10%,rgba(28,108,178,.15),transparent 60%);"></div>
+
+  <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px clamp(16px,3.5vw,40px);background:rgba(4,7,13,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);">
+    <a href="Yeti Wells - Landing.dc.html" style="display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink);">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#0B1320" stroke="#1F2E42"></circle><clipPath id="knav"><circle cx="16" cy="16" r="13.2"></circle></clipPath><g clip-path="url(#knav)"><rect x="0" y="17.5" width="32" height="16" fill="#1C6CB2"></rect><rect x="0" y="17.5" width="32" height="2.4" fill="#5CC8FF"></rect><ellipse cx="16" cy="16.2" rx="5.7" ry="6.3" fill="#EAF6FF"></ellipse><circle cx="13.8" cy="15" r="1.05" fill="#0A1622"></circle><circle cx="18.2" cy="15" r="1.05" fill="#0A1622"></circle><path d="M14.2 18.3 Q16 19.6 17.8 18.3" stroke="#0A1622" stroke-width="0.7" fill="none" stroke-linecap="round"></path></g></svg>
+      <span style="font-family:'Space Mono',monospace;font-weight:700;font-size:13px;letter-spacing:.14em;">YETI&nbsp;WELLS</span>
+    </a>
+    <nav data-appnav style="display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.04em;">
+      <a href="Yeti Wells - Browse.dc.html" style="color:var(--dim);text-decoration:none;padding:7px 14px;border-radius:3px;" onmouseover="this.style.color='#E9F4FF'" onmouseout="this.style.color='#7E92A8'">Campaigns</a>
+      <a href="Yeti Wells - My Impact.dc.html" style="color:var(--dim);text-decoration:none;padding:7px 14px;border-radius:3px;" onmouseover="this.style.color='#E9F4FF'" onmouseout="this.style.color='#7E92A8'">My Impact</a>
+    </nav>
+    <span style="display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:12px;color:var(--dim);background:var(--surface);border:1px solid var(--line);padding:6px 10px;border-radius:3px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--water);box-shadow:0 0 8px var(--water);"></span>0x5282…0ce6</span>
+  </header>
+
+  <main style="position:relative;z-index:5;max-width:1140px;margin:0 auto;padding:clamp(26px,4vw,46px) clamp(16px,3.5vw,40px) 64px;">
+
+    <div data-in style="margin-bottom:30px;max-width:60ch;">
+      <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--brass);margin-bottom:13px;">LAUNCH&nbsp;A&nbsp;WELL</div>
+      <h1 style="font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:clamp(1.9rem,4vw,3rem);line-height:1.0;letter-spacing:-.03em;margin:0 0 12px;">Start a campaign.</h1>
+      <p style="margin:0;color:var(--dim);font-size:1.04rem;line-height:1.55;">You're the organizer — released milestone funds pay out to your address. Donors give gaslessly and mint a soulbound Impact NFT that fills as TEE-verified water is delivered.</p>
+    </div>
+
+    <div data-2col style="display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:26px;align-items:start;">
+
+      <div style="display:flex;flex-direction:column;gap:18px;">
+
+        <section style="border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:clamp(18px,2.4vw,24px);">
+          <div style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.02rem;margin-bottom:16px;">Campaign details</div>
+          <div style="display:flex;flex-direction:column;gap:15px;">
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--dim);">NAME</span>
+              <input value="{{ name }}" onInput="{{ onName }}" maxlength="100" placeholder="e.g. Kibera Borehole №2" style="width:100%;font-size:14px;color:var(--ink);background:var(--deep2);border:1px solid var(--line);border-radius:5px;padding:11px 13px;">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--dim);">LOCATION</span>
+              <input value="{{ location }}" onInput="{{ onLocation }}" maxlength="100" placeholder="e.g. Nairobi, KE" style="width:100%;font-size:14px;color:var(--ink);background:var(--deep2);border:1px solid var(--line);border-radius:5px;padding:11px 13px;">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--dim);">DESCRIPTION</span>
+              <textarea value="{{ description }}" onInput="{{ onDescription }}" maxlength="1000" placeholder="What will this campaign fund, and who does it serve?" style="width:100%;min-height:84px;resize:vertical;font-size:14px;line-height:1.5;color:var(--ink);background:var(--deep2);border:1px solid var(--line);border-radius:5px;padding:11px 13px;"></textarea>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--dim);">COVER IMAGE <span style="color:var(--dim2);">· STORED ON WALRUS</span></span>
+              <div style="display:flex;align-items:center;gap:11px;font-family:'Space Mono',monospace;font-size:12px;color:var(--dim2);border:1px dashed var(--line);border-radius:5px;padding:14px;cursor:pointer;">⌑ Choose an image…</div>
+            </label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <label style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--dim);">FUNDING GOAL (SUI)</span>
+                <input type="number" min="0" step="0.1" value="{{ goalSui }}" onInput="{{ onGoal }}" style="width:100%;font-family:'Space Mono',monospace;font-size:14px;color:var(--ink);background:var(--deep2);border:1px solid var(--line);border-radius:5px;padding:11px 13px;">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--dim);">TARGET LITERS</span>
+                <input type="number" min="0" step="1000" value="{{ targetLiters }}" onInput="{{ onTarget }}" style="width:100%;font-family:'Space Mono',monospace;font-size:14px;color:var(--ink);background:var(--deep2);border:1px solid var(--line);border-radius:5px;padding:11px 13px;">
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section style="border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:clamp(18px,2.4vw,24px);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.02rem;">Milestones</span>
+            <span style="font-family:'Space Mono',monospace;font-size:11px;color:{{ releasesColor }};">releases {{ releasesText }}</span>
+          </div>
+          <p style="margin:0 0 14px;font-size:12px;line-height:1.5;color:var(--dim);">Escrow releases tranche-by-tranche as delivered liters cross each threshold (verified by the TEE). Releases should sum to your funding goal.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <sc-for list="{{ milestones }}" as="m" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:1fr 86px 78px 34px;gap:8px;align-items:center;border:1px solid var(--line);border-radius:7px;padding:10px;background:var(--deep2);">
+                <input value="{{ m.desc }}" onInput="{{ m.onDesc }}" maxlength="120" placeholder="{{ m.placeholder }}" style="width:100%;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:9px 10px;">
+                <input type="number" min="0" value="{{ m.liters }}" onInput="{{ m.onLiters }}" title="Liters threshold" style="width:100%;font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink);background:var(--surface);border:1px solid {{ m.literBorder }};border-radius:4px;padding:9px 8px;">
+                <input type="number" min="0" step="0.1" value="{{ m.sui }}" onInput="{{ m.onSui }}" title="Release (SUI)" style="width:100%;font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:9px 8px;">
+                <button onClick="{{ m.onRemove }}" title="Remove" style="cursor:pointer;display:flex;align-items:center;justify-content:center;width:34px;height:34px;color:var(--dim);background:transparent;border:1px solid var(--line);border-radius:4px;opacity:{{ m.removeOpacity }};">✕</button>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:14px;align-items:center;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--dim2);margin-top:8px;padding:0 2px;">
+            <span style="flex:1;">DESCRIPTION</span><span style="width:86px;">LITERS</span><span style="width:78px;">SUI</span><span style="width:34px;"></span>
+          </div>
+          <button onClick="{{ onAdd }}" style="cursor:pointer;margin-top:14px;display:inline-flex;align-items:center;gap:7px;font-family:'Archivo',sans-serif;font-weight:600;font-size:13px;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:5px;padding:9px 14px;opacity:{{ addOpacity }};" onmouseover="this.style.borderColor='#5CC8FF'" onmouseout="this.style.borderColor='#172333'">+ Add milestone</button>
+        </section>
+
+        <div style="font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.5;color:var(--bad);">{{ validationMsg }}</div>
+
+        <button onClick="{{ onLaunch }}" disabled="{{ launchDisabled }}" style="cursor:pointer;font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;color:var(--deep);background:var(--water);border:none;padding:15px;border-radius:5px;opacity:{{ launchOpacity }};transition:transform .25s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">{{ launchLabel }}</button>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--water);text-align:center;">{{ launchMsg }}</div>
+      </div>
+
+      <aside data-preview style="position:sticky;top:84px;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--dim2);">LIVE PREVIEW · HOW DONORS SEE IT</div>
+        <div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);">
+          <div style="position:relative;height:140px;background:linear-gradient(135deg,#0E2238,#091522);overflow:hidden;">
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(125deg,rgba(92,200,255,.06) 0 2px,transparent 2px 13px);"></div>
+            <div style="position:absolute;left:11px;top:11px;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--dim);background:rgba(4,7,13,.55);border:1px solid var(--line);padding:4px 9px;border-radius:999px;">Fundraising</div>
+            <div style="position:absolute;left:11px;bottom:11px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--dim2);">{{ previewCover }}</div>
+          </div>
+          <div style="padding:16px;display:flex;flex-direction:column;gap:11px;">
+            <div>
+              <div style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.04rem;line-height:1.15;letter-spacing:-.01em;">{{ previewName }}</div>
+              <div style="display:flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);margin-top:5px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--water);flex:none;"></span>{{ previewLocation }}</div>
+              <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:var(--dim2);margin-top:4px;">funds → 0x5282…0ce6</div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--dim);margin-bottom:6px;"><span>RAISED</span><span style="color:var(--ink);">{{ previewRaised }}</span></div>
+              <div style="height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div style="height:100%;width:0%;background:var(--ink);border-radius:3px;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--dim);margin-bottom:6px;"><span>VERIFIED&nbsp;DELIVERED</span><span style="color:var(--dim2);">{{ previewDelivered }}</span></div>
+              <div style="height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div style="height:100%;width:0%;background:#2A3A4E;border-radius:3px;"></div></div>
+            </div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:var(--deep2);font-family:'Space Mono',monospace;font-size:11px;line-height:1.6;color:var(--dim);">
+          <div style="color:var(--dim2);letter-spacing:.1em;margin-bottom:6px;">ON LAUNCH</div>
+          A <span style="color:var(--ink);">WaterProject</span> object is created on Sui; donations escrow inside it and release to you only on TEE-attested delivery.
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer style="position:relative;z-index:5;border-top:1px solid var(--line);padding:22px clamp(16px,3.5vw,40px);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--dim2);">
+    <span style="color:var(--ink);">Every drop, <span style="color:var(--water);">provable.</span></span>
+    <span>MOVE&nbsp;·&nbsp;zkLOGIN&nbsp;·&nbsp;ENOKI&nbsp;·&nbsp;WALRUS&nbsp;·&nbsp;NAUTILUS&nbsp;·&nbsp;TESTNET</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.rootRef = React.createRef();
+    this.state = {
+      name:'Kibera Borehole №2',
+      location:'Nairobi, KE',
+      description:'A second solar-powered borehole to extend clean water to 900 more households in the settlement.',
+      goalSui:1,
+      targetLiters:50000,
+      milestones:[
+        { description:'Project kickoff', liters:0, sui:0.3 },
+        { description:'Halfway delivered', liters:25000, sui:0.3 },
+        { description:'Fully delivered', liters:50000, sui:0.4 },
+      ],
+      status:'idle', launchId:''
+    };
+  }
+
+  setMilestone(i, patch){ this.setState(s=>({ milestones: s.milestones.map((m,j)=> j===i ? {...m, ...patch} : m) })); }
+  addMilestone(){ this.setState(s=> s.milestones.length>=8 ? s : ({ milestones:[...s.milestones, { description:'', liters:s.targetLiters, sui:0 }] })); }
+  removeMilestone(i){ this.setState(s=> s.milestones.length<=1 ? s : ({ milestones: s.milestones.filter((_,j)=>j!==i) })); }
+
+  renderVals(){
+    const s = this.state;
+    const goal = Number(s.goalSui)||0;
+    const target = Number(s.targetLiters)||0;
+    const releaseTotal = s.milestones.reduce((a,m)=> a + (Number(m.sui)||0), 0);
+    const mismatch = Math.abs(releaseTotal - goal) > 1e-9;
+    const thresholdsOk = s.milestones.every((m,i)=> m.liters>=0 && m.liters<=target && (i===0 || m.liters>s.milestones[i-1].liters));
+    const releasesPositive = s.milestones.every(m=> Number(m.sui)>0);
+    const namesOk = s.milestones.every(m=> m.description.trim().length>0);
+    const valid = s.name.trim().length>0 && goal>0 && target>0 && s.milestones.length>0 && namesOk && thresholdsOk && releasesPositive && !mismatch;
+
+    const milestones = s.milestones.map((m,i)=>({
+      desc:m.description, liters:m.liters, sui:m.sui,
+      placeholder:'Milestone '+(i+1)+' description',
+      literBorder: (m.liters<=target && (i===0 || m.liters>s.milestones[i-1].liters)) ? '#172333' : 'rgba(232,133,107,.5)',
+      removeOpacity: s.milestones.length<=1 ? '0.3' : '1',
+      onDesc:(e)=> this.setMilestone(i, { description:e.target.value }),
+      onLiters:(e)=> this.setMilestone(i, { liters: e.target.value===''?0:Number(e.target.value) }),
+      onSui:(e)=> this.setMilestone(i, { sui: e.target.value===''?0:Number(e.target.value) }),
+      onRemove:()=> this.removeMilestone(i)
+    }));
+
+    let validationMsg = '';
+    if(mismatch) validationMsg = 'Milestone releases total '+releaseTotal.toFixed(2)+' SUI but must sum exactly to your goal of '+goal+' SUI.';
+    else if(!thresholdsOk) validationMsg = 'Milestone liter thresholds must strictly increase and stay at or below your target of '+target.toLocaleString('en-US')+' L.';
+    else if(!namesOk) validationMsg = 'Every milestone needs a short description.';
+
+    const fmtL = (n)=> (Number(n)||0).toLocaleString('en-US');
+
+    return {
+      rootRef:this.rootRef,
+      name:s.name, location:s.location, description:s.description, goalSui:s.goalSui, targetLiters:s.targetLiters,
+      milestones,
+      releasesText: releaseTotal.toFixed(2)+' / '+goal+' SUI',
+      releasesColor: mismatch ? '#E8856B' : '#7E92A8',
+      addOpacity: s.milestones.length>=8 ? '0.4' : '1',
+      validationMsg,
+      previewName: s.name.trim() || 'Your campaign name',
+      previewLocation: s.location.trim() || 'Location',
+      previewCover: 'IMG · ' + ((s.location.trim()||'LOCATION').toUpperCase()),
+      previewRaised: '0.00 / '+goal.toFixed(2)+' SUI',
+      previewDelivered: '0 / '+fmtL(target)+' L',
+      launchLabel: s.status==='launching' ? 'Launching campaign…' : 'Launch campaign',
+      launchDisabled: (!valid || s.status==='launching') ? true : false,
+      launchOpacity: (valid && s.status!=='launching') ? '1' : '0.45',
+      launchMsg: s.status==='done' ? ('✅ Campaign live — id 0x'+s.launchId+'… · now in Browse') : '',
+      onName:(e)=> this.setState({ name:e.target.value }),
+      onLocation:(e)=> this.setState({ location:e.target.value }),
+      onDescription:(e)=> this.setState({ description:e.target.value }),
+      onGoal:(e)=> this.setState({ goalSui: e.target.value===''?0:Number(e.target.value) }),
+      onTarget:(e)=> this.setState({ targetLiters: e.target.value===''?0:Number(e.target.value) }),
+      onAdd:()=> this.addMilestone(),
+      onLaunch:()=>{ if(!valid || this.state.status==='launching') return; this.setState({ status:'launching' }); setTimeout(()=> this.setState({ status:'done', launchId: Math.random().toString(16).slice(2,8) }), 1000); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,14 +1,15 @@
 import { LogOut, Plus } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { Button } from "./ui/button";
+import { YetiMark } from "./YetiMark";
 import { useGoogleAuth } from "../lib/auth";
 import { shortAddr } from "../lib/format";
 import { cn } from "../lib/utils";
 
 function navClass({ isActive }: { isActive: boolean }) {
   return cn(
-    "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-    isActive ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground",
+    "rounded-md px-3.5 py-1.5 font-mono text-xs tracking-wide transition-colors",
+    isActive ? "border border-sui/30 bg-sui/10 text-foreground" : "text-muted-foreground hover:text-foreground",
   );
 }
 
@@ -16,20 +17,20 @@ export function Header() {
   const { account, signIn, signOut, canSignIn, isPending } = useGoogleAuth();
 
   return (
-    <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        <Link to="/" className="flex shrink-0 items-center gap-2 font-semibold">
-          <span className="text-xl">🧊</span>
-          <span className="hidden sm:inline">Yeti Wells</span>
+        <Link to="/" className="flex shrink-0 items-center gap-2.5">
+          <YetiMark size={28} />
+          <span className="hidden font-mono text-sm font-bold tracking-[0.14em] sm:inline">YETI&nbsp;WELLS</span>
         </Link>
 
         <nav className="flex items-center gap-1">
-          <NavLink to="/" end className={navClass}>
-            Browse
+          <NavLink to="/campaigns" className={navClass}>
+            Campaigns
           </NavLink>
           <NavLink to="/create" className={navClass}>
             <span className="inline-flex items-center gap-1">
-              <Plus className="h-3.5 w-3.5" /> Start a campaign
+              <Plus className="h-3.5 w-3.5" /> Start
             </span>
           </NavLink>
           {account && (
@@ -41,7 +42,8 @@ export function Header() {
 
         {account ? (
           <div className="flex shrink-0 items-center gap-2">
-            <span className="hidden rounded-md bg-secondary px-2.5 py-1 font-mono text-xs text-secondary-foreground sm:inline">
+            <span className="hidden items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 font-mono text-xs text-muted-foreground sm:flex">
+              <span className="h-[7px] w-[7px] rounded-full bg-sui shadow-[0_0_8px_var(--color-sui)]" />
               {shortAddr(account.address)}
             </span>
             <Button variant="ghost" size="sm" onClick={signOut} title="Sign out" aria-label="Sign out">

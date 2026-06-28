@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Expanded:wght@500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  body{margin:0;background:#04070D;overflow-x:hidden;}
+  ::selection{background:#5CC8FF;color:#04070D;}
+  @keyframes ywPulse{0%,100%{opacity:.5}50%{opacity:1}}
+  @keyframes ywDrift{from{transform:translateX(0)}to{transform:translateX(-33%)}}
+  @keyframes ywReveal{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+  [data-reveal]{animation:ywReveal .9s cubic-bezier(.16,1,.3,1) both;}
+  @media (max-width:880px){
+    [data-shell]{grid-template-columns:1fr!important;padding-left:0!important;padding-right:0!important;}
+    [data-stagecol]{grid-column:1!important;order:-1;}
+    [data-content]{grid-column:1!important;padding-left:22px!important;padding-right:22px!important;}
+    [data-stage]{height:56vh!important;}
+    [data-rail]{display:none!important;}
+    [data-navlinks]{display:none!important;}
+    [data-foot-grid]{grid-template-columns:1fr!important;}
+    [data-steps]{grid-template-columns:1fr!important;}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}[data-reveal]{animation:none!important}}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="--deep:#04070D;--deep2:#080D17;--surface:#0B1320;--surface2:#0E1726;--line:#172333;--ink:#E9F4FF;--dim:#7E92A8;--dim2:#566678;--water:#5CC8FF;--water2:#1C6CB2;--brass:#E7B777;position:relative;background:var(--deep);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;">
+
+  <div data-grain aria-hidden="true" style="position:fixed;inset:0;pointer-events:none;z-index:70;opacity:.05;mix-blend-mode:overlay;"></div>
+  <div aria-hidden="true" style="position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(120% 80% at 80% 0%,rgba(28,108,178,.16),transparent 55%),radial-gradient(90% 60% at 0% 100%,rgba(92,200,255,.06),transparent 60%);"></div>
+
+  <header style="position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px clamp(18px,4vw,44px);backdrop-filter:blur(14px);background:linear-gradient(180deg,rgba(4,7,13,.82),rgba(4,7,13,0));">
+    <a href="#" onClick="{{ scrollTop }}" style="display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink);">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#0B1320" stroke="#1F2E42"></circle><clipPath id="navc"><circle cx="16" cy="16" r="13.2"></circle></clipPath><g clip-path="url(#navc)"><rect x="0" y="17.5" width="32" height="16" fill="#1C6CB2"></rect><rect x="0" y="17.5" width="32" height="2.4" fill="#5CC8FF"></rect><ellipse cx="16" cy="16.2" rx="5.7" ry="6.3" fill="#EAF6FF"></ellipse><circle cx="13.8" cy="15" r="1.05" fill="#0A1622"></circle><circle cx="18.2" cy="15" r="1.05" fill="#0A1622"></circle><path d="M14.2 18.3 Q16 19.6 17.8 18.3" stroke="#0A1622" stroke-width="0.7" fill="none" stroke-linecap="round"></path></g></svg>
+      <span style="font-family:'Space Mono',monospace;font-weight:700;font-size:14px;letter-spacing:.14em;">YETI&nbsp;WELLS</span>
+    </a>
+    <nav data-navlinks style="display:flex;align-items:center;gap:30px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.08em;color:var(--dim);">
+      <a href="#" onClick="{{ scrollHow }}" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#E9F4FF'" onmouseout="this.style.color='#7E92A8'">HOW&nbsp;IT&nbsp;WORKS</a>
+      <a href="#" onClick="{{ scrollCampaigns }}" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#E9F4FF'" onmouseout="this.style.color='#7E92A8'">CAMPAIGNS</a>
+      <a href="#" onClick="{{ scrollVerify }}" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#E9F4FF'" onmouseout="this.style.color='#7E92A8'">VERIFY</a>
+    </nav>
+    <a href="#" onClick="{{ scrollCampaigns }}" style="font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.06em;text-decoration:none;color:var(--deep);background:var(--ink);padding:9px 16px;border-radius:2px;">OPEN&nbsp;APP&nbsp;↗</a>
+  </header>
+
+  <div data-rail style="position:fixed;left:0;top:0;bottom:0;width:74px;z-index:40;display:flex;flex-direction:column;align-items:center;padding:96px 0 40px;pointer-events:none;">
+    <div style="position:relative;flex:1;width:2px;background:linear-gradient(180deg,transparent,var(--line) 8%,var(--line) 92%,transparent);">
+      <div ref="{{ railFillRef }}" style="position:absolute;left:-1px;top:0;width:4px;height:8%;background:linear-gradient(180deg,var(--water),var(--water2));box-shadow:0 0 14px rgba(92,200,255,.6);border-radius:4px;"></div>
+      <div ref="{{ railHeadRef }}" style="position:absolute;left:50%;top:8%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px;">
+        <span ref="{{ depthRef }}" style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--water);background:var(--deep);padding:3px 6px;border:1px solid var(--line);border-radius:2px;white-space:nowrap;">00 m</span>
+        <span style="width:9px;height:9px;border-radius:50%;background:var(--water);box-shadow:0 0 12px rgba(92,200,255,.9);"></span>
+      </div>
+    </div>
+    <div style="writing-mode:vertical-rl;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.34em;color:var(--dim2);margin-top:18px;">BOREHOLE&nbsp;DEPTH</div>
+  </div>
+
+  <div data-shell style="position:relative;z-index:5;display:grid;grid-template-columns:minmax(0,1fr) clamp(340px,40vw,560px);max-width:1560px;margin:0 auto;padding-left:clamp(74px,7vw,128px);">
+
+    <main data-content style="grid-column:1;min-width:0;padding:0 clamp(20px,3.2vw,52px);">
+
+      <section data-sec="hero" style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:118px 0 70px;">
+        <div data-reveal style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.18em;color:var(--water);margin-bottom:26px;display:flex;align-items:center;gap:12px;"><span style="width:26px;height:1px;background:var(--water);display:inline-block;"></span>VERIFIABLE&nbsp;PROOF-OF-IMPACT&nbsp;GIVING&nbsp;·&nbsp;ON&nbsp;SUI</div>
+        <h1 data-reveal style="font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:clamp(2.7rem,6.7vw,5.7rem);line-height:.96;letter-spacing:-.035em;margin:0 0 28px;text-wrap:balance;">Proof you can<br>watch <span style="color:var(--water);font-style:normal;">rise.</span></h1>
+        <p data-reveal style="max-width:48ch;font-size:clamp(1.02rem,1.18vw,1.24rem);line-height:1.62;color:var(--dim);margin:0 0 36px;">Give once to a clean-water campaign. Your money sits in on-chain escrow and releases <em style="color:var(--ink);font-style:normal;">only</em> when a tamper-proof machine signs that real liters were delivered — and your soulbound Impact NFT fills with verified water as it happens.</p>
+        <div data-reveal style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:46px;">
+          <button onClick="{{ scrollCampaigns }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;font-family:'Archivo',sans-serif;font-weight:600;font-size:15px;color:var(--deep);background:var(--ink);border:none;padding:14px 22px;border-radius:3px;transition:transform .25s cubic-bezier(.16,1,.3,1);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'"><span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:var(--deep);color:var(--ink);align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-weight:700;font-size:11px;">G</span>Sign in with Google</button>
+          <button onClick="{{ scrollHow }}" style="cursor:pointer;font-family:'Space Mono',monospace;font-weight:400;font-size:13px;letter-spacing:.04em;color:var(--ink);background:transparent;border:1px solid var(--line);padding:14px 20px;border-radius:3px;transition:border-color .25s,transform .25s;" onmouseover="this.style.borderColor='#5CC8FF';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#172333';this.style.transform='none'">See how proof works&nbsp;↓</button>
+        </div>
+        <div data-reveal style="font-family:'Space Mono',monospace;font-size:13px;color:var(--dim);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;">
+          <span style="color:var(--ink);font-weight:700;font-size:17px;"><span ref="{{ counterRef }}">0</span>&nbsp;L</span><span>proven on-chain</span><span style="color:var(--line);">/</span><span>0 gas</span><span style="color:var(--line);">/</span><span>0 seed phrases</span>
+        </div>
+      </section>
+
+      <section data-sec="thesis" style="min-height:92vh;display:flex;flex-direction:column;justify-content:center;padding:70px 0;">
+        <div data-reveal style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--dim2);margin-bottom:30px;">00&nbsp;—&nbsp;THE&nbsp;PROBLEM</div>
+        <h2 data-reveal style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:clamp(1.9rem,3.9vw,3.3rem);line-height:1.04;letter-spacing:-.02em;margin:0 0 30px;max-width:18ch;">Most giving asks you to trust a dashboard.</h2>
+        <p data-reveal style="max-width:54ch;font-size:clamp(1.04rem,1.2vw,1.28rem);line-height:1.66;color:var(--dim);margin:0;">You send money and <em style="font-style:italic;color:var(--ink);">hope</em> it became clean water. Yeti Wells closes that box with math. Donations sit in on-chain escrow and release milestone-by-milestone — never on a promise, only on a cryptographic proof a real-world threshold was crossed. Not “trust us.” Verify it yourself, on-chain.</p>
+      </section>
+
+      <section data-sec="how" style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 0;">
+        <div data-reveal style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--water);margin-bottom:18px;">HOW&nbsp;PROOF&nbsp;WORKS&nbsp;·&nbsp;FOUR&nbsp;STEPS</div>
+        <h2 data-reveal style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:clamp(1.8rem,3.6vw,3rem);line-height:1.04;letter-spacing:-.02em;margin:0 0 50px;max-width:20ch;">From one tap to verified water.</h2>
+        <div data-steps style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden;">
+          <div data-reveal style="background:var(--deep);padding:clamp(24px,2.4vw,34px);min-height:200px;display:flex;flex-direction:column;">
+            <div style="font-family:'Space Mono',monospace;font-size:13px;color:var(--water);font-weight:700;margin-bottom:18px;">01</div>
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:600;font-size:1.18rem;margin-bottom:12px;letter-spacing:-.01em;">Give, gasless</div>
+            <p style="margin:0;font-size:.97rem;line-height:1.58;color:var(--dim);">Sign in with Google (zkLogin). Donate in one tap. Enoki sponsors the gas — you never see a seed phrase, a wallet install, or a fee.</p>
+          </div>
+          <div data-reveal style="background:var(--deep);padding:clamp(24px,2.4vw,34px);min-height:200px;display:flex;flex-direction:column;">
+            <div style="font-family:'Space Mono',monospace;font-size:13px;color:var(--water);font-weight:700;margin-bottom:18px;">02</div>
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:600;font-size:1.18rem;margin-bottom:12px;letter-spacing:-.01em;">A machine reads reality</div>
+            <p style="margin:0;font-size:.97rem;line-height:1.58;color:var(--dim);">A registered TEE enclave reads the flow-meter and signs a milestone report with a key bound to its exact code — its measurements (PCRs) live on-chain.</p>
+          </div>
+          <div data-reveal style="background:var(--deep);padding:clamp(24px,2.4vw,34px);min-height:200px;display:flex;flex-direction:column;">
+            <div style="font-family:'Space Mono',monospace;font-size:13px;color:var(--water);font-weight:700;margin-bottom:18px;">03</div>
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:600;font-size:1.18rem;margin-bottom:12px;letter-spacing:-.01em;">The chain verifies, escrow releases</div>
+            <p style="margin:0;font-size:.97rem;line-height:1.58;color:var(--dim);">Move verifies the signature against the bound enclave. Change the code and the proof breaks. Funds release to the field partner; delivered liters advance.</p>
+          </div>
+          <div data-reveal style="background:var(--deep);padding:clamp(24px,2.4vw,34px);min-height:200px;display:flex;flex-direction:column;">
+            <div style="font-family:'Space Mono',monospace;font-size:13px;color:var(--water);font-weight:700;margin-bottom:18px;">04</div>
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:600;font-size:1.18rem;margin-bottom:12px;letter-spacing:-.01em;">Your proof fills</div>
+            <p style="margin:0;font-size:.97rem;line-height:1.58;color:var(--dim);">Your soulbound Impact NFT syncs from on-chain truth and fills with verified water. It can never be transferred — and never un-fills.</p>
+          </div>
+        </div>
+      </section>
+
+      <section data-sec="campaigns" style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 0;">
+        <div data-reveal style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--water);margin-bottom:18px;">OPEN&nbsp;CAMPAIGNS&nbsp;·&nbsp;ANYONE&nbsp;CAN&nbsp;LAUNCH&nbsp;ONE</div>
+        <h2 data-reveal style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:clamp(1.8rem,3.6vw,3rem);line-height:1.04;letter-spacing:-.02em;margin:0 0 40px;max-width:18ch;">Standout wells. Standing proof.</h2>
+
+        <div data-reveal style="border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface);">
+          <div data-parallax="0.04" style="position:relative;height:clamp(180px,26vw,300px);background:linear-gradient(135deg,#0E2238,#0A1828);overflow:hidden;">
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(125deg,rgba(92,200,255,.07) 0 2px,transparent 2px 13px);"></div>
+            <div style="position:absolute;left:16px;bottom:14px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--dim);border:1px solid var(--line);padding:5px 9px;border-radius:2px;background:rgba(4,7,13,.55);">IMG&nbsp;·&nbsp;KIBERA&nbsp;BOREHOLE&nbsp;SITE</div>
+            <div style="position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:7px;white-space:nowrap;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--water);background:rgba(92,200,255,.12);border:1px solid rgba(92,200,255,.3);padding:5px 10px;border-radius:2px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--water);box-shadow:0 0 8px var(--water);"></span>TEE-VERIFIED</div>
+          </div>
+          <div style="padding:clamp(22px,2.6vw,34px);">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 12px;margin-bottom:14px;">
+              <h3 style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:clamp(1.25rem,2vw,1.7rem);line-height:1.06;margin:0;letter-spacing:-.015em;">Kibera Borehole №1</h3>
+              <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--dim);white-space:nowrap;">NAIROBI,&nbsp;KE</span>
+            </div>
+            <p style="margin:0 0 26px;color:var(--dim);font-size:1rem;line-height:1.58;max-width:52ch;">Solar-powered borehole serving ~1,200 people with clean water. Every milestone below was released only after a TEE-signed flow-meter reading cleared on-chain.</p>
+            <div style="display:flex;flex-direction:column;gap:18px;margin-bottom:26px;">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12px;color:var(--dim);margin-bottom:8px;"><span>RAISED</span><span style="color:var(--ink);">0.55&nbsp;/&nbsp;1&nbsp;SUI</span></div>
+                <div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div data-bar="0.55" style="height:100%;width:0;background:var(--ink);border-radius:3px;transition:width 1.2s cubic-bezier(.16,1,.3,1);"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12px;color:var(--dim);margin-bottom:8px;"><span>VERIFIED&nbsp;DELIVERED</span><span style="color:var(--water);">100,000&nbsp;/&nbsp;100,000&nbsp;L</span></div>
+                <div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div data-bar="1" style="height:100%;width:0;background:linear-gradient(90deg,var(--water2),var(--water));border-radius:3px;box-shadow:0 0 12px rgba(92,200,255,.5);transition:width 1.4s cubic-bezier(.16,1,.3,1);"></div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;">
+              <button onClick="{{ scrollCampaigns }}" style="cursor:pointer;font-family:'Archivo',sans-serif;font-weight:600;font-size:14px;color:var(--deep);background:var(--water);border:none;padding:12px 20px;border-radius:3px;transition:transform .25s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">Donate · zero gas</button>
+              <button onClick="{{ scrollVerify }}" style="cursor:pointer;font-family:'Space Mono',monospace;font-size:12px;color:var(--ink);background:transparent;border:1px solid var(--line);padding:12px 18px;border-radius:3px;" onmouseover="this.style.borderColor='#5CC8FF'" onmouseout="this.style.borderColor='#172333'">Inspect the proof ↗</button>
+            </div>
+          </div>
+        </div>
+
+        <div data-reveal style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
+          <div style="border:1px solid var(--line);border-radius:6px;padding:22px;background:var(--deep2);">
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--dim2);margin-bottom:10px;">↗&nbsp;MARKETPLACE</div>
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:600;font-size:1.05rem;margin-bottom:6px;">Browse every campaign</div>
+            <p style="margin:0;font-size:.92rem;color:var(--dim);line-height:1.5;">Search, sort by liters proven, and give to any open well.</p>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:6px;padding:22px;background:var(--deep2);">
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--brass);margin-bottom:10px;">+&nbsp;LAUNCH</div>
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:600;font-size:1.05rem;margin-bottom:6px;">Start your own well</div>
+            <p style="margin:0;font-size:.92rem;color:var(--dim);line-height:1.5;">Anyone signed in can launch a campaign — funds route to your address.</p>
+          </div>
+        </div>
+      </section>
+
+      <section data-sec="nft" style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 0;">
+        <div data-reveal style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--water);margin-bottom:18px;">THE&nbsp;LIVING&nbsp;PROOF&nbsp;·&nbsp;SOULBOUND</div>
+        <h2 data-reveal style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:clamp(1.8rem,3.6vw,3rem);line-height:1.04;letter-spacing:-.02em;margin:0 0 30px;max-width:16ch;">A drop that becomes a glacier.</h2>
+        <p data-reveal style="max-width:52ch;font-size:clamp(1.02rem,1.18vw,1.24rem);line-height:1.62;color:var(--dim);margin:0 0 40px;">One Impact NFT per donor per campaign, bound to you forever. It fills with verified water as proven liters arrive, earns XP, and climbs a glacial tier ladder. It is monotonic — it can rise, but never drain.</p>
+        <div data-reveal style="display:flex;flex-wrap:wrap;gap:14px;">
+          <div style="flex:1;min-width:150px;border:1px solid var(--line);border-radius:6px;padding:22px;background:var(--deep2);">
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--dim2);margin-bottom:14px;">CURRENT&nbsp;TIER</div>
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.5rem;color:var(--water);margin-bottom:6px;">River</div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);">NEXT&nbsp;·&nbsp;GLACIER&nbsp;@&nbsp;10,000&nbsp;XP</div>
+          </div>
+          <div style="flex:1;min-width:150px;border:1px solid var(--line);border-radius:6px;padding:22px;background:var(--deep2);">
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--dim2);margin-bottom:14px;">FILL&nbsp;STATE</div>
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.5rem;margin-bottom:6px;">100%</div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);">VERIFIED&nbsp;WATER</div>
+          </div>
+          <div style="flex:1;min-width:150px;border:1px solid var(--line);border-radius:6px;padding:22px;background:var(--deep2);">
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--dim2);margin-bottom:14px;">LITERS&nbsp;ATTRIBUTED</div>
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.5rem;margin-bottom:6px;">9,090</div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);">YOUR&nbsp;SHARE,&nbsp;ON-CHAIN</div>
+          </div>
+        </div>
+      </section>
+
+      <section data-sec="verify" style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 0;">
+        <div data-reveal style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--brass);margin-bottom:18px;">DON’T&nbsp;TRUST.&nbsp;VERIFY.</div>
+        <h2 data-reveal style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:clamp(1.8rem,3.6vw,3rem);line-height:1.04;letter-spacing:-.02em;margin:0 0 30px;max-width:16ch;">Every liter has a receipt.</h2>
+        <p data-reveal style="max-width:52ch;font-size:1.06rem;line-height:1.62;color:var(--dim);margin:0 0 34px;">Evidence photos and meter logs live immutably on Walrus. Each release links to its attestation transaction on Suiscan. The badge is honest: <span style="color:var(--water);">Verified by TEE (AWS Nitro)</span> only when genuine hardware signed — otherwise <span style="color:var(--brass);">Released (demo signer)</span>.</p>
+        <div data-reveal style="border:1px solid var(--line);border-radius:6px;background:#060B14;font-family:'Space Mono',monospace;font-size:12.5px;overflow:hidden;">
+          <div style="display:flex;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--line);color:var(--dim2);"><span>ATTESTATION&nbsp;RECEIPT</span><span style="color:var(--water);">● LIVE&nbsp;ON&nbsp;TESTNET</span></div>
+          <div style="padding:6px 18px 14px;display:flex;flex-direction:column;gap:11px;">
+            <div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:var(--dim);"><span>milestone_release_tx</span><span style="color:var(--ink);">9xnbMKBR…UxiSBV&nbsp;↗</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:var(--dim);"><span>signer == project.enclave_id</span><span style="color:var(--water);">TRUE</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:var(--dim);"><span>ed25519_verify(report)</span><span style="color:var(--water);">PASS</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:var(--dim);"><span>delivered_liters</span><span style="color:var(--ink);">+40,000&nbsp;→&nbsp;100,000</span></div>
+            <div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:var(--dim);"><span>evidence_blob&nbsp;(walrus)</span><span style="color:var(--ink);">community handover ↗</span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div data-stagecol style="grid-column:2;min-width:0;">
+      <div data-stage style="position:sticky;top:0;height:100vh;width:100%;display:block;">
+        <canvas ref="{{ canvasRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+        <div style="position:absolute;left:clamp(18px,2vw,30px);top:96px;font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:var(--dim);line-height:1.7;pointer-events:none;">WELL&nbsp;CORE&nbsp;№01<br><span style="color:var(--dim2);">KIBERA&nbsp;·&nbsp;SOLAR&nbsp;BOREHOLE</span></div>
+        <div ref="{{ sealRef }}" style="position:absolute;right:clamp(18px,2vw,30px);top:96px;display:flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--brass);border:1px solid rgba(231,183,119,.4);border-radius:2px;padding:5px 9px;opacity:0;transition:opacity .6s ease;pointer-events:none;">✓&nbsp;VERIFIED&nbsp;BY&nbsp;TEE</div>
+        <div style="position:absolute;left:0;right:0;bottom:34px;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none;">
+          <span ref="{{ pctRef }}" style="font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:clamp(2rem,4vw,3.2rem);color:var(--ink);line-height:1;letter-spacing:-.02em;">8%</span>
+          <span style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:var(--water);">VERIFIED&nbsp;WATER</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer style="position:relative;z-index:5;border-top:1px solid var(--line);margin-top:40px;padding:clamp(56px,8vw,110px) clamp(22px,5vw,80px) 44px;background:linear-gradient(180deg,var(--deep),#06101C);">
+    <div data-foot-grid style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr;gap:48px;align-items:end;">
+      <div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:26px;">
+          <svg width="44" height="44" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#0B1320" stroke="#1F2E42"></circle><clipPath id="footc"><circle cx="16" cy="16" r="13.2"></circle></clipPath><g clip-path="url(#footc)"><rect x="0" y="17.5" width="32" height="16" fill="#1C6CB2"></rect><rect x="0" y="17.5" width="32" height="2.4" fill="#5CC8FF"></rect><ellipse cx="16" cy="16.2" rx="5.7" ry="6.3" fill="#EAF6FF"></ellipse><circle cx="13.8" cy="15" r="1.05" fill="#0A1622"></circle><circle cx="18.2" cy="15" r="1.05" fill="#0A1622"></circle><path d="M14.2 18.3 Q16 19.6 17.8 18.3" stroke="#0A1622" stroke-width="0.7" fill="none" stroke-linecap="round"></path></g></svg>
+          <span style="font-family:'Space Mono',monospace;font-weight:700;font-size:18px;letter-spacing:.14em;">YETI&nbsp;WELLS</span>
+        </div>
+        <div style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:clamp(2rem,5vw,3.6rem);letter-spacing:-.03em;line-height:1;margin-bottom:24px;">Every drop, <span style="color:var(--water);">provable.</span></div>
+        <button onClick="{{ scrollTop }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:10px;font-family:'Archivo',sans-serif;font-weight:600;font-size:15px;color:var(--deep);background:var(--ink);border:none;padding:14px 22px;border-radius:3px;transition:transform .25s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'"><span style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:var(--deep);color:var(--ink);align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-weight:700;font-size:11px;">G</span>Sign in with Google</button>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--dim);line-height:2;">
+        <div style="color:var(--dim2);letter-spacing:.14em;margin-bottom:14px;">BUILT&nbsp;ON&nbsp;THE&nbsp;SUI&nbsp;STACK</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="border:1px solid var(--line);padding:4px 10px;border-radius:2px;">MOVE</span>
+          <span style="border:1px solid var(--line);padding:4px 10px;border-radius:2px;">zkLOGIN</span>
+          <span style="border:1px solid var(--line);padding:4px 10px;border-radius:2px;">ENOKI</span>
+          <span style="border:1px solid var(--line);padding:4px 10px;border-radius:2px;">WALRUS</span>
+          <span style="border:1px solid var(--line);padding:4px 10px;border-radius:2px;">NAUTILUS</span>
+        </div>
+        <div style="margin-top:26px;color:var(--dim2);">© 2026 · TESTNET · VERIFY IT YOURSELF</div>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.rootRef = React.createRef();
+    this.canvasRef = React.createRef();
+    this.railFillRef = React.createRef();
+    this.railHeadRef = React.createRef();
+    this.depthRef = React.createRef();
+    this.counterRef = React.createRef();
+    this.pctRef = React.createRef();
+    this.sealRef = React.createRef();
+    this.water = 0.10;       // current (lerped) fill 0..1
+    this.target = 0.10;      // scroll-driven target
+    this.phase = 0;
+    this.maxDepth = 118;
+    this.bubbles = [];
+    this.reduced = false;
+    this._lastCanvas = null;
+  }
+
+  componentDidMount(){
+    try { this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){ this.reduced = false; }
+    this.scroller = this.rootRef.current;
+
+    // grain
+    const grain = this.rootRef.current && this.rootRef.current.querySelector('[data-grain]');
+    if(grain){
+      const noise = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E";
+      grain.style.backgroundImage = 'url("' + noise + '")';
+    }
+
+    // init bubbles
+    for(let i=0;i<16;i++){
+      this.bubbles.push({ x:Math.random(), y:Math.random(), r:0.6+Math.random()*2.2, sp:0.0012+Math.random()*0.0026, drift:(Math.random()-0.5)*0.0006 });
+    }
+
+    this._onResize = () => this.sizeCanvas();
+    window.addEventListener('resize', this._onResize, { passive:true });
+    this.sizeCanvas();
+
+    // Reveals are CSS-driven ([data-reveal] keyframe in <helmet>): default-visible, animate in,
+    // end at opacity:1. No JS hide — content can never be left permanently invisible.
+
+    // progress bars animate when in view
+    const bars = this.rootRef.current ? this.rootRef.current.querySelectorAll('[data-bar]') : [];
+    if('IntersectionObserver' in window){
+      this.barIo = new IntersectionObserver((entries)=>{
+        entries.forEach(en=>{
+          if(en.isIntersecting){
+            const p = parseFloat(en.target.getAttribute('data-bar'))||0;
+            en.target.style.width = (p*100)+'%';
+            this.barIo.unobserve(en.target);
+          }
+        });
+      }, { threshold:0.4 });
+      bars.forEach(b=>this.barIo.observe(b));
+    } else {
+      bars.forEach(b=>{ b.style.width = ((parseFloat(b.getAttribute('data-bar'))||0)*100)+'%'; });
+    }
+    setTimeout(()=>{ bars.forEach(b=>{ if(!parseFloat(b.style.width)) b.style.width = ((parseFloat(b.getAttribute('data-bar'))||0)*100)+'%'; }); }, 1700);
+
+    // hero count-up
+    this.startCount();
+
+    // initial paint + rAF loop + interval watchdog (robust if rAF is starved)
+    this.tick();
+    this._raf = requestAnimationFrame(this.loop);
+    this._iv = setInterval(this.tick, 90);
+    this._onScroll = () => this.tick();
+    window.addEventListener('scroll', this._onScroll, { passive:true, capture:true });
+    document.addEventListener('scroll', this._onScroll, { passive:true, capture:true });
+  }
+
+  componentWillUnmount(){
+    cancelAnimationFrame(this._raf);
+    if(this._iv) clearInterval(this._iv);
+    if(this._onScroll){ window.removeEventListener('scroll', this._onScroll, { capture:true }); document.removeEventListener('scroll', this._onScroll, { capture:true }); }
+    window.removeEventListener('resize', this._onResize);
+    if(this.io) this.io.disconnect();
+    if(this.barIo) this.barIo.disconnect();
+  }
+
+  startCount(){
+    const el = this.counterRef.current;
+    if(!el) return;
+    const target = 100000, dur = 1900, t0 = performance.now();
+    const fmt = n => Math.round(n).toLocaleString('en-US');
+    if(this.reduced){ el.textContent = fmt(target); return; }
+    const step = (t)=>{
+      const k = Math.min(1,(t-t0)/dur);
+      const e = 1-Math.pow(1-k,3);
+      el.textContent = fmt(target*e);
+      if(k<1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+    setTimeout(()=>{ if(el) el.textContent = fmt(target); }, dur + 400);
+  }
+
+  sizeCanvas(){
+    const c = this.canvasRef.current;
+    if(!c) return;
+    const dpr = Math.min(window.devicePixelRatio||1, 2);
+    const w = c.clientWidth||1, h = c.clientHeight||1;
+    c.width = Math.round(w*dpr);
+    c.height = Math.round(h*dpr);
+    const ctx = c.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    this.cw = w; this.ch = h; this.ctx = ctx;
+  }
+
+  tick = () => {
+    try {
+    // mechanism-agnostic scroll progress: works for native OR transform-based host scrolling
+    const root = this.rootRef.current;
+    let prog = 0;
+    if(root){
+      const rect = root.getBoundingClientRect();
+      const vh = window.innerHeight || root.clientHeight || 1;
+      const denom = (rect.height - vh) || 1;
+      prog = Math.min(1, Math.max(0, -rect.top / denom));
+    }
+    this.target = 0.10 + 0.90*prog;
+    this.water += (this.target - this.water) * (this.reduced ? 1 : 0.075);
+    if(!this.reduced) this.phase += 0.018;
+
+    if(this.railFillRef.current) this.railFillRef.current.style.height = (8 + prog*88) + '%';
+    if(this.railHeadRef.current) this.railHeadRef.current.style.top = (8 + prog*88) + '%';
+    if(this.depthRef.current) this.depthRef.current.textContent = Math.round(prog*this.maxDepth).toString().padStart(2,'0') + ' m';
+    if(this.pctRef.current) this.pctRef.current.textContent = Math.round(this.water*100) + '%';
+    if(this.sealRef.current) this.sealRef.current.style.opacity = this.water > 0.9 ? '1' : '0';
+
+    const c = this.canvasRef.current;
+    if(c && c.clientWidth>0 && (c!==this._lastCanvas || c.clientWidth!==this.cw || c.clientHeight!==this.ch)){ this.sizeCanvas(); this._lastCanvas = c; }
+    this.draw();
+    } catch(e){ if(typeof window!=='undefined') window.__ywLoopErr=(e&&e.message)||String(e); }
+  }
+
+  loop = () => {
+    this.tick();
+    this._raf = requestAnimationFrame(this.loop);
+  }
+
+  draw(){
+    const ctx = this.ctx; if(!ctx) return;
+    const W = this.cw, H = this.ch;
+    ctx.clearRect(0,0,W,H);
+
+    // tube geometry
+    const tubeW = Math.min(W*0.66, 300);
+    const tx = (W - tubeW)/2;
+    const top = H*0.05, bot = H*0.88, tubeH = bot - top;
+    const r = tubeW/2;
+    const waterTop = bot - this.water*tubeH;
+
+    // backdrop glow behind tube
+    const g0 = ctx.createRadialGradient(W/2, H*0.42, 10, W/2, H*0.42, tubeW*1.5);
+    g0.addColorStop(0,'rgba(28,108,178,0.20)');
+    g0.addColorStop(1,'rgba(28,108,178,0)');
+    ctx.fillStyle = g0; ctx.fillRect(0,0,W,H);
+
+    // tube path (rounded capsule)
+    const tubePath = ()=>{
+      ctx.beginPath();
+      ctx.moveTo(tx, top+r);
+      ctx.arc(tx+r, top+r, r, Math.PI, 0);
+      ctx.lineTo(tx+tubeW, bot-r);
+      ctx.arc(tx+r, bot-r, r, 0, Math.PI);
+      ctx.closePath();
+    };
+
+    // empty glass interior (reads even when low)
+    ctx.save(); tubePath(); ctx.clip();
+    const inner = ctx.createLinearGradient(0, top, 0, bot);
+    inner.addColorStop(0,'rgba(16,26,42,0.5)');
+    inner.addColorStop(1,'rgba(6,11,20,0.82)');
+    ctx.fillStyle = inner; ctx.fillRect(tx, top, tubeW, tubeH);
+    const vol = ctx.createLinearGradient(tx,0,tx+tubeW,0);
+    vol.addColorStop(0,'rgba(150,205,255,0.16)');
+    vol.addColorStop(0.5,'rgba(150,205,255,0)');
+    vol.addColorStop(1,'rgba(150,205,255,0.11)');
+    ctx.fillStyle = vol; ctx.fillRect(tx, top, tubeW, tubeH);
+    ctx.restore();
+
+    // clip to tube, draw water
+    ctx.save();
+    tubePath(); ctx.clip();
+
+    // water body
+    const wg = ctx.createLinearGradient(0, waterTop, 0, bot);
+    wg.addColorStop(0,'#7FD8FF');
+    wg.addColorStop(0.12,'#5CC8FF');
+    wg.addColorStop(0.6,'#2C86C8');
+    wg.addColorStop(1,'#103E66');
+    ctx.fillStyle = wg;
+    ctx.fillRect(tx, waterTop, tubeW, bot-waterTop);
+
+    // wavy surface
+    const amp = this.reduced ? 0 : 5;
+    ctx.beginPath();
+    ctx.moveTo(tx, waterTop);
+    for(let x=0; x<=tubeW; x+=6){
+      const xn = x/tubeW;
+      const y = waterTop + Math.sin(xn*Math.PI*3 + this.phase)*amp + Math.sin(xn*Math.PI*7 - this.phase*1.4)*amp*0.45;
+      ctx.lineTo(tx+x, y);
+    }
+    ctx.lineTo(tx+tubeW, bot); ctx.lineTo(tx, bot); ctx.closePath();
+    ctx.fillStyle = wg; ctx.fill();
+
+    // surface highlight line
+    ctx.beginPath();
+    for(let x=0; x<=tubeW; x+=6){
+      const xn = x/tubeW;
+      const y = waterTop + Math.sin(xn*Math.PI*3 + this.phase)*amp + Math.sin(xn*Math.PI*7 - this.phase*1.4)*amp*0.45;
+      if(x===0) ctx.moveTo(tx+x,y); else ctx.lineTo(tx+x,y);
+    }
+    ctx.strokeStyle = 'rgba(220,245,255,0.7)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+    // caustic bands
+    for(let i=0;i<3;i++){
+      const yy = waterTop + ((bot-waterTop) * (0.18 + i*0.26)) + Math.sin(this.phase*0.8 + i)*6;
+      ctx.fillStyle = 'rgba(180,230,255,0.06)';
+      ctx.fillRect(tx, yy, tubeW, 2.5);
+    }
+
+    // bubbles (within water)
+    this.bubbles.forEach(b=>{
+      if(!this.reduced){ b.y -= b.sp; b.x += b.drift; }
+      if(b.y < 0) { b.y = 1; b.x = Math.random(); }
+      const by = bot - b.y*(bot-waterTop);
+      if(by > waterTop+2){
+        const bx = tx + (0.12 + b.x*0.76)*tubeW;
+        ctx.beginPath();
+        ctx.arc(bx, by, b.r, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(225,245,255,0.35)';
+        ctx.fill();
+      }
+    });
+
+    // ---- Yeti ----
+    this.drawYeti(ctx, tx+tubeW/2, waterTop, tubeW);
+
+    ctx.restore();
+
+    // depth ticks on right inner edge
+    ctx.fillStyle = 'rgba(126,146,168,0.5)';
+    ctx.strokeStyle = 'rgba(126,146,168,0.28)';
+    for(let i=0;i<=10;i++){
+      const ty2 = top + (tubeH*i/10);
+      const len = (i%5===0)? 14 : 8;
+      ctx.beginPath();
+      ctx.moveTo(tx+tubeW-2, ty2);
+      ctx.lineTo(tx+tubeW-2-len, ty2);
+      ctx.lineWidth=1; ctx.stroke();
+    }
+
+    // frost caps + glass rim + specular
+    ctx.save(); tubePath(); ctx.clip();
+    const capTop = ctx.createLinearGradient(0, top, 0, top + r*1.3);
+    capTop.addColorStop(0,'rgba(222,243,255,0.24)');
+    capTop.addColorStop(1,'rgba(222,243,255,0)');
+    ctx.fillStyle = capTop; ctx.fillRect(tx, top, tubeW, r*1.4);
+    const spec = ctx.createLinearGradient(tx,0,tx+tubeW*0.45,0);
+    spec.addColorStop(0,'rgba(255,255,255,0.18)');
+    spec.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = spec; ctx.fillRect(tx, top, tubeW*0.45, tubeH);
+    const spec2 = ctx.createLinearGradient(tx+tubeW*0.78,0,tx+tubeW,0);
+    spec2.addColorStop(0,'rgba(255,255,255,0)');
+    spec2.addColorStop(1,'rgba(255,255,255,0.12)');
+    ctx.fillStyle = spec2; ctx.fillRect(tx+tubeW*0.78, top, tubeW*0.22, tubeH);
+    ctx.restore();
+    tubePath(); ctx.strokeStyle = 'rgba(92,200,255,0.16)'; ctx.lineWidth = 5; ctx.stroke();
+    tubePath(); ctx.strokeStyle = 'rgba(196,228,255,0.5)'; ctx.lineWidth = 1.6; ctx.stroke();
+  }
+
+  drawYeti(ctx, cx, surfaceY, tubeW){
+    const R = tubeW*0.19;
+    const bob = this.reduced ? 0 : Math.sin(this.phase)*4;
+    const cy = surfaceY - R*0.18 + bob;
+    const tilt = this.reduced ? 0 : Math.sin(this.phase*0.7)*0.05;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(tilt);
+
+    // reflection (faint, below)
+    ctx.save();
+    ctx.globalAlpha = 0.12;
+    ctx.scale(1,-1);
+    ctx.beginPath();
+    ctx.ellipse(0, R*1.3, R*0.95, R*1.05, 0, 0, Math.PI*2);
+    ctx.fillStyle = '#EAF6FF'; ctx.fill();
+    ctx.restore();
+
+    // ears
+    ctx.fillStyle = '#EAF6FF';
+    ctx.beginPath(); ctx.ellipse(-R*0.62,-R*0.7, R*0.26, R*0.3, 0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse( R*0.62,-R*0.7, R*0.26, R*0.3, 0,0,Math.PI*2); ctx.fill();
+
+    // body / head
+    ctx.beginPath();
+    ctx.ellipse(0,0, R*0.95, R*1.06, 0, 0, Math.PI*2);
+    ctx.fillStyle = '#EDF6FF'; ctx.fill();
+
+    // soft cold rim-light
+    ctx.beginPath();
+    ctx.ellipse(-R*0.18,-R*0.12, R*0.7, R*0.8, 0, 0, Math.PI*2);
+    const rim = ctx.createRadialGradient(-R*0.3,-R*0.3,1,-R*0.3,-R*0.3,R*1.1);
+    rim.addColorStop(0,'rgba(255,255,255,0.5)');
+    rim.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = rim; ctx.fill();
+
+    // eyes
+    ctx.fillStyle = '#0A1622';
+    ctx.beginPath(); ctx.ellipse(-R*0.34,-R*0.06, R*0.12, R*0.16, 0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse( R*0.34,-R*0.06, R*0.12, R*0.16, 0,0,Math.PI*2); ctx.fill();
+    // eye glints
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath(); ctx.arc(-R*0.30,-R*0.12, R*0.04,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc( R*0.38,-R*0.12, R*0.04,0,Math.PI*2); ctx.fill();
+
+    // smile
+    ctx.strokeStyle = '#0A1622'; ctx.lineWidth = Math.max(1.2, R*0.05); ctx.lineCap='round';
+    ctx.beginPath(); ctx.arc(0, R*0.12, R*0.32, 0.18*Math.PI, 0.82*Math.PI); ctx.stroke();
+
+    // cheeks
+    ctx.fillStyle = 'rgba(120,200,255,0.35)';
+    ctx.beginPath(); ctx.arc(-R*0.5, R*0.16, R*0.12,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc( R*0.5, R*0.16, R*0.12,0,Math.PI*2); ctx.fill();
+
+    // submerged tint over lower half
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(-R*1.2, R*0.18 - bob, R*2.4, R*2);
+    ctx.clip();
+    ctx.beginPath();
+    ctx.ellipse(0,0, R*0.97, R*1.08, 0, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(60,150,220,0.32)'; ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  renderVals(){
+    const findScroller = () => {
+      let el = this.rootRef.current;
+      while(el && el !== document.body){
+        const oy = getComputedStyle(el).overflowY;
+        if((oy==='auto'||oy==='scroll') && el.scrollHeight > el.clientHeight + 4) return el;
+        el = el.parentElement;
+      }
+      return document.scrollingElement || document.documentElement;
+    };
+    const scrollTo = (sel) => (e) => {
+      if(e && e.preventDefault) e.preventDefault();
+      const root = this.rootRef.current; if(!root) return;
+      const el = root.querySelector(sel); if(!el) return;
+      const sc = findScroller();
+      const rectTop = el.getBoundingClientRect().top;
+      try {
+        if(sc===document.scrollingElement || sc===document.documentElement){
+          const cur = window.scrollY || document.documentElement.scrollTop || 0;
+          window.scrollTo({ top: cur + rectTop - 56, behavior: this.reduced ? 'auto' : 'smooth' });
+        } else {
+          sc.scrollTo({ top: sc.scrollTop + (rectTop - sc.getBoundingClientRect().top) - 56, behavior: this.reduced ? 'auto' : 'smooth' });
+        }
+      } catch(_){ }
+    };
+    return {
+      rootRef: this.rootRef,
+      canvasRef: this.canvasRef,
+      railFillRef: this.railFillRef,
+      railHeadRef: this.railHeadRef,
+      depthRef: this.depthRef,
+      counterRef: this.counterRef,
+      pctRef: this.pctRef,
+      sealRef: this.sealRef,
+      scrollTop: (e)=>{ if(e&&e.preventDefault)e.preventDefault(); const sc=findScroller(); try{ if(sc===document.scrollingElement||sc===document.documentElement){ window.scrollTo({top:0,behavior:this.reduced?'auto':'smooth'}); } else { sc.scrollTo({top:0,behavior:this.reduced?'auto':'smooth'}); } }catch(_){ } },
+      scrollHow: scrollTo('[data-sec="how"]'),
+      scrollCampaigns: scrollTo('[data-sec="campaigns"]'),
+      scrollVerify: scrollTo('[data-sec="verify"]')
+    };
+  }
+}
+</script>
+</body>
+</html>

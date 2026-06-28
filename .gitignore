@@ -42,3 +42,4 @@ enclave/nautilus/
 # stray local tooling state / test screenshots
 .oyster-deposit-coin
 create-page.png
+*.jpeg

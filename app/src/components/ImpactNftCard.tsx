@@ -3,7 +3,7 @@ import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useQueryClient } from "@tanstack/react-query";
 import { ShieldCheck, ShieldQuestion, Share2, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { WaterGlobe } from "./WaterGlobe";
+import { ImpactOrb } from "./ImpactOrb";
 import { useMyNft, useProject, useLatestAttestationV2 } from "../lib/queries";
 import { useSyncImpact } from "../lib/useSyncImpact";
 import { computeImpact, tierRange } from "../lib/impact";
@@ -59,7 +59,7 @@ export function ImpactNftCard({ projectId }: { projectId: string }) {
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-3 py-4">
           <div className="yw-globe-glow rounded-full">
-            <WaterGlobe fillPercent={0} tier={0} size={200} />
+            <ImpactOrb fillPercent={0} tier={0} size={200} />
           </div>
           <p className="text-center text-sm text-muted-foreground">
             Sign in &amp; donate to mint your soulbound globe — it fills with water as TEE-verified liters are delivered.
@@ -95,7 +95,7 @@ export function ImpactNftCard({ projectId }: { projectId: string }) {
       <CardContent className="space-y-4">
         <div className="flex flex-col items-center gap-2">
           <div key={Math.round(c.fillPercent)} className="yw-globe-glow yw-pop rounded-full">
-            <WaterGlobe fillPercent={c.fillPercent} tier={c.tier} size={208} />
+            <ImpactOrb fillPercent={c.fillPercent} tier={c.tier} size={208} />
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold tabular-nums text-sui">{c.fillPercent}%</div>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Expanded:wght@500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html{-webkit-font-smoothing:antialiased;}
+  body{margin:0;background:#04070D;overflow-x:hidden;}
+  ::selection{background:#5CC8FF;color:#04070D;}
+  input::placeholder{color:#566678;}
+  @keyframes cIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes cpop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+  [data-in]{animation:cIn .7s cubic-bezier(.16,1,.3,1) both;}
+  [data-in]:nth-of-type(2){animation-delay:.07s}
+  @media (max-width:900px){ [data-2col]{grid-template-columns:1fr!important;} [data-ev]{grid-template-columns:1fr!important;} }
+  @media (max-width:620px){ [data-appnav]{display:none!important;} }
+  @media (prefers-reduced-motion:reduce){[data-in]{animation:none!important;}}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="--deep:#04070D;--deep2:#080D17;--surface:#0B1320;--surface2:#0E1726;--line:#172333;--ink:#E9F4FF;--dim:#7E92A8;--dim2:#566678;--water:#5CC8FF;--water2:#1C6CB2;--brass:#E7B777;position:relative;min-height:100vh;background:var(--deep);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;">
+
+  <div aria-hidden="true" style="position:fixed;inset:0 0 auto 0;height:440px;pointer-events:none;z-index:0;background:radial-gradient(78% 100% at 78% -10%,rgba(28,108,178,.16),transparent 60%);"></div>
+
+  <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px clamp(16px,3.5vw,40px);background:rgba(4,7,13,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);">
+    <a href="Yeti Wells - Landing.dc.html" style="display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink);">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#0B1320" stroke="#1F2E42"></circle><clipPath id="cnav"><circle cx="16" cy="16" r="13.2"></circle></clipPath><g clip-path="url(#cnav)"><rect x="0" y="17.5" width="32" height="16" fill="#1C6CB2"></rect><rect x="0" y="17.5" width="32" height="2.4" fill="#5CC8FF"></rect><ellipse cx="16" cy="16.2" rx="5.7" ry="6.3" fill="#EAF6FF"></ellipse><circle cx="13.8" cy="15" r="1.05" fill="#0A1622"></circle><circle cx="18.2" cy="15" r="1.05" fill="#0A1622"></circle><path d="M14.2 18.3 Q16 19.6 17.8 18.3" stroke="#0A1622" stroke-width="0.7" fill="none" stroke-linecap="round"></path></g></svg>
+      <span style="font-family:'Space Mono',monospace;font-weight:700;font-size:13px;letter-spacing:.14em;">YETI&nbsp;WELLS</span>
+    </a>
+    <nav data-appnav style="display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.04em;">
+      <a href="Yeti Wells - Browse.dc.html" style="color:var(--ink);background:rgba(92,200,255,.1);border:1px solid rgba(92,200,255,.28);padding:7px 14px;border-radius:3px;text-decoration:none;">Campaigns</a>
+      <a href="#" style="color:var(--dim);text-decoration:none;padding:7px 14px;border-radius:3px;" onmouseover="this.style.color='#E9F4FF'" onmouseout="this.style.color='#7E92A8'">My Impact</a>
+    </nav>
+    <span style="display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:12px;color:var(--dim);background:var(--surface);border:1px solid var(--line);padding:6px 10px;border-radius:3px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--water);box-shadow:0 0 8px var(--water);"></span>0x5282…0ce6</span>
+  </header>
+
+  <main style="position:relative;z-index:5;max-width:1160px;margin:0 auto;padding:clamp(20px,3vw,34px) clamp(16px,3.5vw,40px) 64px;">
+
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <a href="Yeti Wells - Browse.dc.html" style="display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:12px;color:var(--dim);text-decoration:none;" onmouseover="this.style.color='#E9F4FF'" onmouseout="this.style.color='#7E92A8'">← ALL&nbsp;CAMPAIGNS</a>
+      <div style="display:flex;gap:10px;">
+        <a href="#" style="display:inline-flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:12px;color:var(--ink);background:var(--surface);border:1px solid var(--line);padding:8px 13px;border-radius:3px;text-decoration:none;" onmouseover="this.style.borderColor='#5CC8FF'" onmouseout="this.style.borderColor='#172333'">⌁ On-chain ↗</a>
+        <button onClick="{{ onShare }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:12px;color:{{ shareColor }};background:var(--surface);border:1px solid var(--line);padding:8px 13px;border-radius:3px;">{{ shareLabel }}</button>
+      </div>
+    </div>
+
+    <div data-2col style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start;margin-bottom:22px;">
+
+      <section data-in style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);">
+        <div style="position:relative;height:200px;background:linear-gradient(135deg,#0E2238,#091522);overflow:hidden;">
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(125deg,rgba(92,200,255,.06) 0 2px,transparent 2px 14px);"></div>
+          <div style="position:absolute;left:14px;top:14px;display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11px;color:var(--water);background:rgba(92,200,255,.12);border:1px solid rgba(92,200,255,.3);padding:5px 11px;border-radius:999px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--water);"></span>Fully delivered</div>
+          <div style="position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:5px;font-family:'Space Mono',monospace;font-size:10px;color:var(--brass);background:rgba(4,7,13,.5);border:1px solid rgba(231,183,119,.4);padding:5px 9px;border-radius:3px;">✓ TEE · AWS NITRO</div>
+          <div style="position:absolute;left:14px;bottom:14px;font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:var(--dim2);">IMG · KIBERA BOREHOLE SITE</div>
+        </div>
+        <div style="padding:clamp(18px,2.4vw,26px);display:flex;flex-direction:column;gap:18px;">
+          <div>
+            <h1 style="font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:clamp(1.5rem,2.6vw,2rem);letter-spacing:-.02em;margin:0 0 6px;line-height:1.05;">Kibera Borehole №1</h1>
+            <div style="display:flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:12px;color:var(--dim);"><span style="width:5px;height:5px;border-radius:50%;background:var(--water);"></span>Nairobi, KE</div>
+          </div>
+          <p style="margin:0;color:var(--dim);font-size:1rem;line-height:1.6;">Solar-powered borehole serving ~1,200 people with clean water. Every milestone below released only after a TEE-signed flow-meter reading cleared on-chain.</p>
+
+          <div style="border:1px dashed var(--line);border-radius:8px;padding:14px;background:rgba(8,13,23,.5);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:'Space Mono',monospace;font-size:11.5px;">
+              <span style="color:var(--dim);">Funds release to (organizer)</span>
+              <a href="#" style="color:var(--water);text-decoration:none;">0x7a3f…7a8b ↗</a>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:8px;margin-top:9px;font-size:11.5px;line-height:1.5;color:var(--dim2);">
+              <span style="color:var(--brass);flex:none;">⚠</span><span>Anyone can launch a campaign — verify the organizer before donating. Escrow releases only on TEE-attested delivery.</span>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--dim);margin-bottom:7px;"><span>RAISED</span><span style="color:var(--ink);">0.55 / 1.00 SUI</span></div>
+              <div style="height:6px;background:var(--surface2);border-radius:4px;overflow:hidden;"><div style="height:100%;width:55%;background:var(--ink);border-radius:4px;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--dim);margin-bottom:7px;"><span>VERIFIED&nbsp;DELIVERED</span><span style="color:var(--water);">100,000 / 100,000 L</span></div>
+              <div style="height:6px;background:var(--surface2);border-radius:4px;overflow:hidden;"><div style="height:100%;width:100%;background:linear-gradient(90deg,var(--water2),var(--water));border-radius:4px;box-shadow:0 0 12px rgba(92,200,255,.5);"></div></div>
+            </div>
+          </div>
+
+          <div style="border:1px solid var(--line);border-radius:8px;padding:16px;background:var(--deep2);">
+            <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--dim);margin-bottom:13px;">MILESTONES</div>
+            <div style="display:flex;flex-direction:column;gap:13px;">
+              <sc-for list="{{ milestones }}" as="m" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:11px;">
+                  <span style="width:18px;height:18px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;background:{{ m.dotBg }};color:{{ m.dotColor }};border:1px solid {{ m.dotBorder }};">{{ m.glyph }}</span>
+                  <span style="font-size:13.5px;color:{{ m.textColor }};">{{ m.desc }}</span>
+                  <span style="margin-left:auto;font-family:'Space Mono',monospace;font-size:11px;color:var(--dim2);white-space:nowrap;">{{ m.meta }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid var(--line);padding-top:18px;display:flex;flex-direction:column;gap:12px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+              <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+                <button onClick="{{ p.onClick }}" style="cursor:pointer;font-family:'Archivo',sans-serif;font-weight:600;font-size:14px;padding:11px;border-radius:4px;background:{{ p.bg }};color:{{ p.color }};border:1px solid {{ p.border }};">{{ p.label }}</button>
+              </sc-for>
+            </div>
+            <button onClick="{{ onDonate }}" style="cursor:pointer;font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;color:var(--deep);background:var(--water);border:none;padding:14px;border-radius:4px;transition:transform .25s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">{{ donateLabel }}</button>
+            <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--water);text-align:center;">{{ donateMsg }}</div>
+            <div style="text-align:center;font-family:'Space Mono',monospace;font-size:11px;color:var(--dim2);">Zero gas — sponsored. Tops up your Impact NFT.</div>
+          </div>
+        </div>
+      </section>
+
+      <section data-in style="border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:clamp(18px,2.4vw,26px);display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:-.01em;">Your Impact NFT</span>
+          <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--dim2);border:1px solid var(--line);padding:4px 8px;border-radius:3px;">SOULBOUND</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div ref="{{ globeRef }}" style="position:relative;width:clamp(190px,46%,230px);aspect-ratio:1;">
+            <canvas ref="{{ canvasRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:1.9rem;color:var(--water);letter-spacing:-.02em;line-height:1;">100%</div>
+            <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:var(--dim);margin-top:4px;">filled with verified water</div>
+          </div>
+        </div>
+
+        <div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.15rem;">River</span>
+            <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);">NEXT · GLACIER @ 10,000 XP</span>
+          </div>
+          <div style="height:6px;background:var(--surface2);border-radius:4px;overflow:hidden;"><div style="height:100%;width:91%;background:linear-gradient(90deg,var(--water2),var(--water));border-radius:4px;"></div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;">
+          <div style="border:1px solid var(--line);border-radius:7px;padding:12px;text-align:center;background:var(--deep2);">
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.05rem;">0.05</div>
+            <div style="font-family:'Space Mono',monospace;font-size:9.5px;color:var(--dim2);margin-top:3px;">SUI DONATED</div>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:7px;padding:12px;text-align:center;background:var(--deep2);">
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.05rem;color:var(--water);">9,090</div>
+            <div style="font-family:'Space Mono',monospace;font-size:9.5px;color:var(--dim2);margin-top:3px;">LITERS ATTRIB.</div>
+          </div>
+          <div style="border:1px solid var(--line);border-radius:7px;padding:12px;text-align:center;background:var(--deep2);">
+            <div style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.05rem;">9,090</div>
+            <div style="font-family:'Space Mono',monospace;font-size:9.5px;color:var(--dim2);margin-top:3px;">XP</div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:16px;">
+          <a href="#" style="display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--water);background:rgba(92,200,255,.12);padding:6px 11px;border-radius:999px;text-decoration:none;">🛡 Verified by TEE (AWS Nitro) ↗</a>
+          <button onClick="{{ onShare }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--ink);background:transparent;border:1px solid var(--line);padding:6px 11px;border-radius:4px;">{{ shareLabel }}</button>
+        </div>
+      </section>
+    </div>
+
+    <div data-ev style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start;">
+
+      <section style="border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:clamp(18px,2.4vw,24px);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <span style="font-family:'Archivo Expanded',sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:-.01em;">Evidence</span>
+          <span style="font-family:'Space Mono',monospace;font-size:10.5px;color:var(--dim2);">IMMUTABLE · STORED ON WALRUS</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;">
+          <sc-for list="{{ evidence }}" as="e" hint-placeholder-count="3">
+            <a href="#" style="display:block;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--deep2);transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(92,200,255,.4)'" onmouseout="this.style.borderColor='#172333'">
+              <div style="position:relative;height:104px;background:linear-gradient(135deg,#0E2238,#091522);overflow:hidden;">
+                <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(125deg,rgba(92,200,255,.06) 0 2px,transparent 2px 13px);"></div>
+                <div style="position:absolute;left:10px;bottom:8px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;color:var(--dim2);">{{ e.imgTag }}</div>
+              </div>
+              <div style="padding:11px;">
+                <div style="font-size:12px;line-height:1.35;color:var(--ink);margin-bottom:7px;">{{ e.caption }}</div>
+                <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:9.5px;color:var(--dim2);"><span>{{ e.ms }}</span><span style="color:var(--water);">↗ WALRUS</span></div>
+              </div>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+
+      <aside style="display:flex;flex-direction:column;gap:18px;">
+        <div style="border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:20px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--dim);">TOP&nbsp;SUPPORTERS</span>
+            <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--dim2);margin-left:auto;">THIS&nbsp;CAMPAIGN</span>
+          </div>
+          <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:13px;">
+            <sc-for list="{{ leaders }}" as="l" hint-placeholder-count="5">
+              <li style="display:flex;align-items:center;gap:11px;font-size:13px;">
+                <span style="width:18px;text-align:center;font-family:'Space Mono',monospace;font-size:12px;color:{{ l.rankColor }};">{{ l.rank }}</span>
+                <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);">{{ l.addr }}</span>
+                <span style="margin-left:auto;font-family:'Archivo',sans-serif;font-weight:700;font-variant-numeric:tabular-nums;color:var(--water);">{{ l.sui }}</span>
+                <span style="width:42px;text-align:right;font-family:'Space Mono',monospace;font-size:10px;color:var(--dim2);">{{ l.gifts }}</span>
+              </li>
+            </sc-for>
+          </ol>
+        </div>
+      </aside>
+    </div>
+
+    <section style="margin-top:22px;border:1px dashed var(--line);border-radius:10px;background:rgba(8,13,23,.4);padding:clamp(18px,2.4vw,24px);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--brass);">STEWARD CONSOLE</span>
+        <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--dim2);">DEMO CONTROL · MAKES THE PROOF LOOP VISIBLE</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:14px;">
+        <div style="border:1px solid var(--line);border-radius:8px;padding:16px;background:var(--deep2);">
+          <div style="display:flex;align-items:center;gap:7px;font-family:'Archivo',sans-serif;font-weight:600;font-size:13.5px;margin-bottom:6px;"><span style="color:var(--water);">🛡</span> Run TEE attestation (Nautilus)</div>
+          <p style="margin:0 0 13px;font-size:12px;line-height:1.5;color:var(--dim);">The enclave reads the flow-meter, signs a MilestoneReport, and the chain verifies it before releasing escrow.</p>
+          <div style="display:flex;gap:8px;">
+            <input value="{{ stewardMs }}" onInput="{{ onMs }}" style="width:64px;font-family:'Space Mono',monospace;font-size:13px;text-align:center;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:9px;outline:none;">
+            <button onClick="{{ onRunAttestation }}" style="cursor:pointer;flex:1;font-family:'Archivo',sans-serif;font-weight:600;font-size:13px;color:{{ stewardBtnColor }};background:{{ stewardBtnBg }};border:1px solid var(--line);border-radius:4px;padding:9px;">{{ stewardLabel }}</button>
+          </div>
+          <div style="margin-top:11px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--water);line-height:1.5;">{{ stewardMsg }}</div>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:8px;padding:16px;background:var(--deep2);">
+          <div style="font-family:'Archivo',sans-serif;font-weight:600;font-size:13.5px;margin-bottom:6px;">Add evidence (Walrus)</div>
+          <p style="margin:0 0 13px;font-size:12px;line-height:1.5;color:var(--dim);">Upload a geotagged photo or meter log; the blob id is pinned on-chain to a milestone.</p>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:9px;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--dim2);border:1px dashed var(--line);border-radius:4px;padding:9px 11px;">⌑ Choose file… <span style="color:var(--dim2);margin-left:auto;">no file</span></div>
+            <input placeholder="Caption (e.g. Borehole completed)" style="font-family:'Archivo',sans-serif;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:9px 11px;outline:none;">
+            <button style="cursor:pointer;font-family:'Archivo',sans-serif;font-weight:600;font-size:13px;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:4px;padding:9px;">Upload evidence</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer style="position:relative;z-index:5;border-top:1px solid var(--line);padding:22px clamp(16px,3.5vw,40px);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--dim2);">
+    <span style="color:var(--ink);">Every drop, <span style="color:var(--water);">provable.</span></span>
+    <span>MOVE&nbsp;·&nbsp;zkLOGIN&nbsp;·&nbsp;ENOKI&nbsp;·&nbsp;WALRUS&nbsp;·&nbsp;NAUTILUS&nbsp;·&nbsp;TESTNET</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.rootRef = React.createRef();
+    this.canvasRef = React.createRef();
+    this.globeRef = React.createRef();
+    this.level = 0.94; this.phase = 0; this.bubbles = []; this.reduced = false; this._lastCanvas = null;
+    this.state = { amount:0.05, donate:'idle', donateTx:'', copied:false, steward:'idle', stewardTx:'', stewardMs:'2' };
+    this.milestones = [
+      { desc:'Drill borehole', meta:'0 L · 0.20 SUI', released:true },
+      { desc:'Deliver 50,000 L', meta:'50,000 L · 0.30 SUI', released:true },
+      { desc:'Project complete', meta:'100,000 L · 0.50 SUI', released:true },
+    ];
+    this.evidence = [
+      { caption:'Borehole drilling underway — Kibera site', ms:'MILESTONE 0', imgTag:'IMG · DRILL RIG' },
+      { caption:'Flow-meter reading: 60,000 L delivered', ms:'MILESTONE 1', imgTag:'IMG · METER LOG' },
+      { caption:'Community handover — clean water flowing', ms:'MILESTONE 2', imgTag:'IMG · HANDOVER' },
+    ];
+    this.leaders = [
+      ['0x7a3f…7a8b','0.30',6],['0x4d7e…5c6d','0.12',3],['0x6c1a…5e6f','0.08',2],
+      ['0x9f4c…b6c7','0.05',1],['0x2b8e…4b5c','0.05',1],
+    ];
+  }
+
+  componentDidMount(){
+    try { this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){ this.reduced = false; }
+    for(let i=0;i<16;i++){ this.bubbles.push({ a:Math.random()*Math.PI*2, rr:Math.random(), y:Math.random(), r:0.6+Math.random()*2, sp:0.0014+Math.random()*0.003 }); }
+    this._onResize = () => this.sizeCanvas();
+    window.addEventListener('resize', this._onResize, { passive:true });
+    this.sizeCanvas();
+    this.draw();
+    this._raf = requestAnimationFrame(this.loop);
+    this._iv = setInterval(this.tick, 90);
+  }
+  componentWillUnmount(){
+    cancelAnimationFrame(this._raf);
+    if(this._iv) clearInterval(this._iv);
+    window.removeEventListener('resize', this._onResize);
+  }
+
+  sizeCanvas(){
+    const c = this.canvasRef.current; if(!c) return;
+    const dpr = Math.min(window.devicePixelRatio||1, 2);
+    const w = c.clientWidth||1, h = c.clientHeight||1;
+    c.width = Math.round(w*dpr); c.height = Math.round(h*dpr);
+    const ctx = c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    this.cw = w; this.ch = h; this.ctx = ctx;
+  }
+
+  tick = () => {
+    try {
+      if(!this.reduced) this.phase += 0.02;
+      const c = this.canvasRef.current;
+      if(c && c.clientWidth>0 && (c!==this._lastCanvas || c.clientWidth!==this.cw || c.clientHeight!==this.ch)){ this.sizeCanvas(); this._lastCanvas = c; }
+      this.draw();
+    } catch(e){ if(typeof window!=='undefined') window.__cErr=(e&&e.message)||String(e); }
+  }
+  loop = () => { this.tick(); this._raf = requestAnimationFrame(this.loop); }
+
+  pop(){
+    const el = this.globeRef.current; if(!el || this.reduced) return;
+    el.style.animation = 'none'; void el.offsetWidth; el.style.animation = 'cpop .55s cubic-bezier(.16,1,.3,1)';
+  }
+
+  draw(){
+    const ctx = this.ctx; if(!ctx) return;
+    const W = this.cw, H = this.ch;
+    ctx.clearRect(0,0,W,H);
+    const cx = W/2, cy = H/2, R = Math.min(W,H)/2 - 4;
+
+    const og = ctx.createRadialGradient(cx,cy,R*0.6, cx,cy,R*1.3);
+    og.addColorStop(0,'rgba(40,130,200,0.28)'); og.addColorStop(1,'rgba(40,130,200,0)');
+    ctx.fillStyle = og; ctx.beginPath(); ctx.arc(cx,cy,R*1.3,0,Math.PI*2); ctx.fill();
+
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
+    const base = ctx.createLinearGradient(0,cy-R,0,cy+R);
+    base.addColorStop(0,'rgba(18,28,44,0.7)'); base.addColorStop(1,'rgba(6,11,20,0.92)');
+    ctx.fillStyle = base; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+
+    const waterTop = (cy+R) - this.level*(2*R);
+    const wg = ctx.createLinearGradient(0,waterTop,0,cy+R);
+    wg.addColorStop(0,'#7FD8FF'); wg.addColorStop(0.14,'#5CC8FF'); wg.addColorStop(0.6,'#2C86C8'); wg.addColorStop(1,'#103E66');
+    const amp = this.reduced ? 0 : 5;
+    ctx.beginPath(); ctx.moveTo(cx-R, waterTop);
+    for(let x=-R;x<=R;x+=6){ const xn=(x+R)/(2*R); const y = waterTop + Math.sin(xn*Math.PI*3 + this.phase)*amp + Math.sin(xn*Math.PI*7 - this.phase*1.3)*amp*0.4; ctx.lineTo(cx+x, y); }
+    ctx.lineTo(cx+R, cy+R); ctx.lineTo(cx-R, cy+R); ctx.closePath();
+    ctx.fillStyle = wg; ctx.fill();
+    ctx.beginPath();
+    for(let x=-R;x<=R;x+=6){ const xn=(x+R)/(2*R); const y = waterTop + Math.sin(xn*Math.PI*3 + this.phase)*amp + Math.sin(xn*Math.PI*7 - this.phase*1.3)*amp*0.4; if(x===-R) ctx.moveTo(cx+x,y); else ctx.lineTo(cx+x,y); }
+    ctx.strokeStyle='rgba(220,245,255,0.7)'; ctx.lineWidth=1.5; ctx.stroke();
+
+    this.bubbles.forEach(b=>{ if(!this.reduced) b.y -= b.sp; if(b.y<0) b.y=1; const by = (cy+R) - b.y*((cy+R)-waterTop); const bx = cx + Math.cos(b.a)*R*0.7*(b.rr); if(by>waterTop+2 && (bx-cx)*(bx-cx)+(by-cy)*(by-cy) < R*R*0.92){ ctx.beginPath(); ctx.arc(bx,by,b.r,0,Math.PI*2); ctx.fillStyle='rgba(225,245,255,0.32)'; ctx.fill(); } });
+
+    this.drawYeti(ctx, cx, waterTop, R);
+
+    const is = ctx.createRadialGradient(cx,cy,R*0.55, cx,cy,R);
+    is.addColorStop(0,'rgba(0,0,0,0)'); is.addColorStop(1,'rgba(0,0,0,0.4)');
+    ctx.fillStyle=is; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+    const sp = ctx.createRadialGradient(cx-R*0.4,cy-R*0.5,1, cx-R*0.4,cy-R*0.5,R*0.9);
+    sp.addColorStop(0,'rgba(255,255,255,0.22)'); sp.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=sp; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.strokeStyle='rgba(92,200,255,0.18)'; ctx.lineWidth=6; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.strokeStyle='rgba(200,230,255,0.55)'; ctx.lineWidth=1.6; ctx.stroke();
+  }
+
+  drawYeti(ctx, cx, surfaceY, R){
+    const r = R*0.26;
+    const bob = this.reduced ? 0 : Math.sin(this.phase)*3.5;
+    const cyy = surfaceY - r*0.16 + bob;
+    const tilt = this.reduced ? 0 : Math.sin(this.phase*0.7)*0.05;
+    ctx.save(); ctx.translate(cx, cyy); ctx.rotate(tilt);
+    ctx.fillStyle='#EDF6FF';
+    ctx.beginPath(); ctx.ellipse(-r*0.6,-r*0.7,r*0.26,r*0.3,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(r*0.6,-r*0.7,r*0.26,r*0.3,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0,0,r*0.95,r*1.06,0,0,Math.PI*2); ctx.fillStyle='#EDF6FF'; ctx.fill();
+    const rim = ctx.createRadialGradient(-r*0.3,-r*0.3,1,-r*0.3,-r*0.3,r*1.1);
+    rim.addColorStop(0,'rgba(255,255,255,0.5)'); rim.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.beginPath(); ctx.ellipse(-r*0.18,-r*0.12,r*0.7,r*0.8,0,0,Math.PI*2); ctx.fillStyle=rim; ctx.fill();
+    ctx.fillStyle='#0A1622';
+    ctx.beginPath(); ctx.ellipse(-r*0.34,-r*0.06,r*0.12,r*0.16,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(r*0.34,-r*0.06,r*0.12,r*0.16,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.85)';
+    ctx.beginPath(); ctx.arc(-r*0.3,-r*0.12,r*0.04,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(r*0.38,-r*0.12,r*0.04,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#0A1622'; ctx.lineWidth=Math.max(1.2,r*0.05); ctx.lineCap='round';
+    ctx.beginPath(); ctx.arc(0,r*0.12,r*0.32,0.18*Math.PI,0.82*Math.PI); ctx.stroke();
+    ctx.fillStyle='rgba(120,200,255,0.35)';
+    ctx.beginPath(); ctx.arc(-r*0.5,r*0.16,r*0.12,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(r*0.5,r*0.16,r*0.12,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.rect(-r*1.2, r*0.18 - bob, r*2.4, r*2.2); ctx.clip();
+    ctx.beginPath(); ctx.ellipse(0,0,r*0.97,r*1.08,0,0,Math.PI*2); ctx.fillStyle='rgba(60,150,220,0.32)'; ctx.fill();
+    ctx.restore(); ctx.restore();
+  }
+
+  renderVals(){
+    const { amount, donate, donateTx, copied, steward, stewardTx, stewardMs } = this.state;
+    const presets = [0.05,0.1,0.2].map(p=>({
+      label: p+' SUI', val:p, active: amount===p,
+      bg: amount===p ? '#E9F4FF' : 'transparent',
+      color: amount===p ? '#04070D' : '#E9F4FF',
+      border: amount===p ? '#E9F4FF' : '#172333',
+      onClick: ()=> this.setState({ amount:p })
+    }));
+    const milestones = this.milestones.map(m=>({
+      desc:m.desc, meta:m.meta,
+      glyph: m.released ? '✓' : '',
+      dotBg: m.released ? 'rgba(92,200,255,0.15)' : 'transparent',
+      dotColor: m.released ? '#5CC8FF' : '#566678',
+      dotBorder: m.released ? 'rgba(92,200,255,0.4)' : '#172333',
+      textColor: m.released ? '#E9F4FF' : '#7E92A8'
+    }));
+    const medals = ['01','02','03'];
+    const leaders = this.leaders.map((r,i)=>({
+      rank: medals[i] || String(i+1).padStart(2,'0'),
+      rankColor: i===0 ? '#E7B777' : (i<3 ? '#5CC8FF' : '#566678'),
+      addr:r[0], sui:r[1]+' SUI', gifts:r[2]+(r[2]===1?' gift':' gifts')
+    }));
+    return {
+      rootRef:this.rootRef, canvasRef:this.canvasRef, globeRef:this.globeRef,
+      presets, milestones, leaders, evidence:this.evidence,
+      donateLabel: donate==='pending' ? 'Confirming…' : ('Add '+amount+' SUI'),
+      donateMsg: donate==='done' ? ('✅ Donated — tx '+donateTx+'… · zero gas') : '',
+      shareLabel: copied ? '✓ Link copied' : '⤴ Share',
+      shareColor: copied ? '#5CC8FF' : '#E9F4FF',
+      stewardMs,
+      stewardLabel: steward==='pending' ? 'Attesting…' : 'Run attestation',
+      stewardBtnBg: steward==='done' ? 'rgba(92,200,255,0.12)' : 'var(--surface)',
+      stewardBtnColor: steward==='done' ? '#5CC8FF' : '#E9F4FF',
+      stewardMsg: steward==='done' ? ('✅ Milestone released — ed25519 verified vs bound enclave · tx '+stewardTx+'…') : '',
+      onDonate: ()=>{ if(this.state.donate==='pending') return; this.setState({ donate:'pending' }); setTimeout(()=>{ this.setState({ donate:'done', donateTx:'0x'+Math.random().toString(16).slice(2,8) }); this.pop(); }, 850); },
+      onShare: ()=>{ this.setState({ copied:true }); setTimeout(()=>this.setState({ copied:false }), 1600); },
+      onMs: (e)=> this.setState({ stewardMs: e.target.value }),
+      onRunAttestation: ()=>{ if(this.state.steward==='pending') return; this.setState({ steward:'pending' }); setTimeout(()=>{ this.setState({ steward:'done', stewardTx:'0x'+Math.random().toString(16).slice(2,8) }); }, 1050); }
+    };
+  }
+}
+</script>
+</body>
+</html>
