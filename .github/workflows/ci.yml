@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  move-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Sui CLI (suiup)
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/MystenLabs/suiup/main/install.sh | bash || true
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Move tests
+        working-directory: move/yeti_wells
+        run: sui move test
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build frontend
+        working-directory: app
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build

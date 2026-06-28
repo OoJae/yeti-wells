@@ -1,18 +1,18 @@
-# Marlin Oyster deployment manifest for the Yeti Wells enclave.
-# After `docker build` + push, set `image` to the pushed digest (oyster computes PCRs from it):
-#   DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' <registry>/yeti-wells-enclave:latest)
-#   then put ${DIGEST} below.
-# Deploy:  oyster-cvm deploy --wallet-private-key $PK --docker-compose ./docker-compose.yml \
-#            --instance-type c6g.xlarge --duration-in-minutes 60 --deployment sui
+# Marlin Oyster deploy manifest for the Yeti Wells enclave (oyster-cvm 5.0.1 build/deploy).
+# Built from a LOCAL image tar (no registry):
+#   oyster-cvm build  --platform arm64 --docker-compose this --docker-images app.tar -o result
+#   oyster-cvm upload --file result/<image>            # -> IPFS url
+#   oyster-cvm deploy --deployment sui --wallet-private-key "$(cat .oyster-wallet)" \
+#                     --arch arm64 --image-url <ipfs> --docker-compose this --duration-in-minutes 60
 services:
   yeti-wells-enclave:
-    image: <registry>/yeti-wells-enclave@sha256:<digest>
+    image: yeti-wells-enclave:arm64
     container_name: yeti-wells-enclave
-    restart: unless-stopped
     init: true
     network_mode: host
+    restart: unless-stopped
     environment:
-      # The trusted flow-meter feed the enclave reads; must return { "liters": <u64> }.
-      - SENSOR_URL=https://<your-flow-meter>/reading
+      # Public flow-meter the enclave reads — a STABLE GitHub-raw endpoint (no ephemeral tunnel); returns { "liters": N }.
+      - SENSOR_URL=https://raw.githubusercontent.com/OoJae/yeti-wells-eif/main/sensor.json
       # Unused by the Yeti Wells app (present only because the shared AppState carries it).
       - API_KEY=unused

@@ -35,3 +35,10 @@ yeti-wells-phase*.png
 
 # Nautilus clone (reproducible; our app lives in enclave/yeti_wells_app)
 enclave/nautilus/
+
+# Oyster payment wallet key (your money — never commit)
+.oyster-wallet
+
+# stray local tooling state / test screenshots
+.oyster-deposit-coin
+create-page.png

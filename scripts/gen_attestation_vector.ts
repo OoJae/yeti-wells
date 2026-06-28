@@ -91,6 +91,11 @@ const sIntentHappy = await sig(pIntentHappy);
 const sIntentWrong = await sig(pIntentWrong);
 console.log(`const SIG_V2_HAPPY: vector<u8> = ${hex(sIntentHappy)};`);
 console.log(`const SIG_V2_WRONG: vector<u8> = ${hex(sIntentWrong)};`);
+// Phase 9 extra negatives: below-threshold (milestone 1, 50_000) + out-of-range index (5).
+const sIntentLow = await sig(encodeIntent(PROJECT_ID, 1n, 50_000n, TS));
+const sIntentOob = await sig(encodeIntent(PROJECT_ID, 5n, 60_000n, TS));
+console.log(`const SIG_V2_LOW: vector<u8> = ${hex(sIntentLow)};`);
+console.log(`const SIG_V2_OOB: vector<u8> = ${hex(sIntentOob)};`);
 
 console.log('// sanity (payload hex, for cross-checking Move encode_*_for_testing):');
 console.log(`//   pHappy        = ${Buffer.from(pHappy).toString('hex')}`);

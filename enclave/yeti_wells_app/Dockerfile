@@ -4,7 +4,7 @@
 #
 # The container runs the axum server on :3000 exposing /process_data + /health_check (the enclave's ed25519
 # ephemeral pubkey). Oyster's CVM provides the genuine Nitro attestation (PCRs via `oyster-cvm verify`).
-FROM rust:slim-bookworm AS build
+FROM rust:1.88-slim-bookworm AS build
 RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config libssl-dev ca-certificates git && rm -rf /var/lib/apt/lists/*
 WORKDIR /src

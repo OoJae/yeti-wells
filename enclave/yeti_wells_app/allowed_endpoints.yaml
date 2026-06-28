@@ -1,4 +1,2 @@
-# Domains the enclave is allowed to reach (egress is forwarded by the parent EC2 + checked here).
-# Add the host of your SENSOR_URL (the trusted flow-meter feed) below.
 endpoints:
-  - sensor.yetiwells.xyz
+  - raw.githubusercontent.com
