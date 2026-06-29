@@ -132,15 +132,14 @@ pnpm install && pnpm dev
 | Backend (Railway) | https://yeti-wells-backend-production.up.railway.app |
 
 > A compatible Sui upgrade keeps the **original** package id for struct/event *type tags* but mints a **new**
-> id for calling changed/new functions — hence the two package ids above. Full id list + build log:
-> [`PROGRESS.md`](PROGRESS.md).
+> id for calling changed/new functions — hence the two package ids above.
 
 ## Security & testing
 
 - **37 Move unit tests** (happy + negative paths) — run `sui move test`. CI (`.github/workflows/ci.yml`)
   runs the Move tests + the frontend build on every push.
 - The codebase went through an **adversarial security study** (multi-agent find → independent verify) that
-  surfaced 29 issues; **all were remediated** — see [`PROGRESS.md`](PROGRESS.md) Phase 9. Highlights:
+  surfaced 29 issues; **all were remediated**. Highlights:
   enclave-bound milestone release (no forged attestations), donor refunds, validated campaign creation,
   monotonic Impact NFTs, rate-limiting + a funder spend cap, env-only secrets (`.dockerignore`), and an
   honest genuine-vs-demo TEE badge.
@@ -151,5 +150,4 @@ pnpm install && pnpm dev
 
 Phases 0–9 shipped ✅ — core Move protocol, animated Impact NFT, Walrus evidence, genuine TEE attestation
 (AWS-Nitro, proven on-chain), zkLogin gasless donate, a public multi-campaign marketplace, and a full
-adversarial-study security hardening pass. Live and demo-ready. See [`PROGRESS.md`](PROGRESS.md) for the
-detailed build log.
+adversarial-study security hardening pass. Live and demo-ready.

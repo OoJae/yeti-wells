@@ -43,3 +43,10 @@ enclave/nautilus/
 .oyster-deposit-coin
 create-page.png
 *.jpeg
+
+# Internal planning / strategy / build-log docs — not public-facing
+CLAUDE.md
+PROGRESS.md
+Winning-the-CLAY-Hackathon-Research.md
+Yeti-Wells-Build-Plan.md
+Yeti-Wells-Claude-Code-Master-Prompt.md
