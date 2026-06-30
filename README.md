@@ -146,8 +146,3 @@ pnpm install && pnpm dev
 - Donations are paid from the donor's own coins; only `donate` / `donate_again` / `sync_impact` / `refund`
   are sponsorship-whitelisted; campaign creation + attestation are admin-co-signed.
 
-## Status
-
-Phases 0–9 shipped ✅ — core Move protocol, animated Impact NFT, Walrus evidence, genuine TEE attestation
-(AWS-Nitro, proven on-chain), zkLogin gasless donate, a public multi-campaign marketplace, and a full
-adversarial-study security hardening pass. Live and demo-ready.
